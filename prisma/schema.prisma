@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma/client"
@@ -8,20 +7,49 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Status {
+  ENABLED
+  DISABLED
+}
+
+enum IsoCodeCurrency {
+  USD
+  CDF
+}
+
+enum Gender {
+  M
+  F
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
+
+enum TransferType {
+  MONEY_TRANSFER
+  GOLD_TRANSFER
+}
+
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  role          String    @default("user")
-  banned        Boolean   @default(false)
-  banReason     String?
-  banExpires    DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id                   String        @id
+  name                 String
+  email                String
+  emailVerified        Boolean       @default(false)
+  image                String?
+  role                 String        @default("user")
+  banned               Boolean       @default(false)
+  banReason            String?
+  banExpires           DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  sessions             Session[]
+  accounts             Account[]
+  createdBankAccounts  BankAccount[] @relation("user_creator")
+  operatedTransactions Transaction[] @relation("transaction_operator")
+  operatedTransfers    Transfer[]    @relation("transfer_operator")
 
   @@unique([email])
   @@map("user")
@@ -74,4 +102,103 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Company {
+  id          String          @id @default(cuid())
+  code        String          @unique
+  name        String
+  shortName   String?         @default("")
+  description String?         @default("")
+  logo        String?         @default("")
+  icon        String?         @default("")
+  currency    IsoCodeCurrency
+  country     String?         @default("")
+  province    String?         @default("")
+  city        String?         @default("")
+  address     String?         @default("")
+  webSiteUrl  String?         @default("") @map("web_site_url")
+  motto       String?         @default("")
+  phone1      String?         @default("")
+  phone2      String?         @default("")
+  email       String?         @default("")
+  status      Status
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@map("company")
+}
+
+model BankAccount {
+  id            String        @id @default(cuid())
+  accountNumber String        @unique
+  balance       Float
+  avatar        String?
+  firstName     String        @map("first_name")
+  lastName      String        @map("last_name")
+  surname       String?       @default("")
+  gender        Gender
+  phone         String        @unique
+  otherPhone    String?       @default("")
+  blocked       Boolean       @default(false)
+  country       String?       @default("")
+  province      String?       @default("")
+  city          String?       @default("")
+  address       String?       @default("")
+  createdBy     User?         @relation("user_creator", fields: [createdById], references: [id])
+  createdById   String?       @map("created_by_id")
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@map("bank_account")
+}
+
+model Transaction {
+  id           String          @id @default(cuid())
+  date         DateTime
+  amount       Float
+  goldQuantity String?         @default("")
+  title        String?         @default("")
+  message      String          @default("")
+  type         TransactionType
+  account      BankAccount     @relation(fields: [accountId], references: [id])
+  accountId    String          @map("account_id")
+  operator     User            @relation("transaction_operator", fields: [operatorId], references: [id])
+  operatorId   String          @map("operator_id")
+  deleted      Boolean         @default(false)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  @@map("transaction")
+}
+
+model Partner {
+  id        String     @id @default(cuid())
+  code      String     @unique
+  balance   Float
+  transfers Transfer[]
+  deleted   Boolean    @default(false)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@map("partner")
+}
+
+model Transfer {
+  id           String       @id @default(cuid())
+  date         DateTime
+  type         TransferType
+  amount       Float
+  goldQuantity String?      @default("")
+  sender       String
+  message      String       @default("")
+  partner      Partner      @relation(fields: [partnerId], references: [id])
+  partnerId    String
+  operator     User         @relation("transfer_operator", fields: [operatorId], references: [id])
+  operatorId   String
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@map("transfer")
 }

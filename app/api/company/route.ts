@@ -1,0 +1,60 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { companyCreateSchema } from "@/lib/schemas/company";
+
+export async function GET() {
+  try {
+    const company = await prisma.company.findFirst();
+    if (!company) {
+      return NextResponse.json({ error: "Company not found" }, { status: 404 });
+    }
+    return NextResponse.json(company);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch company" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const parsed = companyCreateSchema.safeParse(body.company);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid company data", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const existingCompany = await prisma.company.findFirst();
+    if (existingCompany) {
+      return NextResponse.json(
+        { error: "Company already exists" },
+        { status: 409 }
+      );
+    }
+
+    const company = await prisma.company.create({
+      data: parsed.data,
+    });
+
+    await auth.api.signUpEmail({
+      body: {
+        name: body.admin.name,
+        email: body.admin.email,
+        password: body.admin.password,
+      },
+    });
+
+    return NextResponse.json(company, { status: 201 });
+  } catch (error) {
+    console.error("Setup error:", error);
+    return NextResponse.json(
+      { error: "Failed to create company or admin user" },
+      { status: 500 }
+    );
+  }
+}
