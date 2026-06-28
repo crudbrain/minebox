@@ -1,30 +1,34 @@
+"use client";
+
+import { memo, useMemo } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu } from "antd";
 
 interface DetailTabsHeaderProps {
-  title: string;
-  tabs: { key: string; label: string }[];
-  activeKey: string;
-  onChange: (key: string) => void;
+  tabs: { key: string; label: string; path: string }[];
 }
 
-export function DetailTabsHeader({
-  title,
+export const DetailTabsHeader = memo(function DetailTabsHeader({
   tabs,
-  activeKey,
-  onChange,
 }: DetailTabsHeaderProps) {
+  const pathname = usePathname();
+
+  const activeKey =
+    tabs.find((t) => pathname === t.path)?.key ?? tabs[0]?.key;
+
+  const items = useMemo(
+    () =>
+      tabs.map((t) => ({
+        key: t.key,
+        label: <Link href={t.path}>{t.label}</Link>,
+      })),
+    [tabs]
+  );
+
   return (
-    <div className="mb-6">
-      <h1 className="text-2xl font-semibold mb-4">{title}</h1>
-      <Menu
-        mode="horizontal"
-        selectedKeys={[activeKey]}
-        items={tabs.map((t) => ({
-          key: t.key,
-          label: t.label,
-          onClick: () => onChange(t.key),
-        }))}
-      />
+    <div>
+      <Menu mode="horizontal" selectedKeys={[activeKey]} items={items} />
     </div>
   );
-}
+});

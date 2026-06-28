@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal, Form, Input, Select, Switch, Button, message } from "antd";
+import { Modal, Form, Input, Select, Switch, message } from "antd";
 import { useEffect } from "react";
 import {
   useCreateBankAccount,
@@ -35,23 +35,32 @@ export function BankAccountFormModal({
     if (open && isEdit && bankAccount) {
       form.setFieldsValue(bankAccount);
     }
-    if (!open) {
-      form.resetFields();
-    }
   }, [open, isEdit, bankAccount, generatedNumber, form]);
 
-  const handleSubmit = async (values: any) => {
-    try {
-      if (isEdit) {
-        await updateMutation.mutateAsync({ id: bankAccount.id, data: values });
-        message.success("Compte mis à jour");
-      } else {
-        await createMutation.mutateAsync(values);
-        message.success("Compte créé");
-      }
-      onClose();
-    } catch {
-      message.error("Échec de l'opération");
+  const handleSubmit = (values: any) => {
+    if (isEdit) {
+      updateMutation.mutate(
+        { id: bankAccount.id, data: values },
+        {
+          onSuccess: () => {
+            message.success("Compte mis à jour");
+            onClose();
+          },
+          onError: () => {
+            message.error("Échec de l'opération");
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          message.success("Compte créé");
+          onClose();
+        },
+        onError: () => {
+          message.error("Échec de l'opération");
+        },
+      });
     }
   };
 
@@ -60,76 +69,71 @@ export function BankAccountFormModal({
       title={isEdit ? "Modifier le compte" : "Nouveau compte"}
       open={open}
       onCancel={onClose}
-      footer={null}
-      destroyOnClose
+      okText={isEdit ? "Enregistrer" : "Créer"}
+      cancelText="Annuler"
+      okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
+      destroyOnHidden
+      modalRender={(dom) => (
+        <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending}>
+          {dom}
+        </Form>
+      )}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item label="Numéro de compte" name="accountNumber">
-          <Input disabled={isEdit} />
-        </Form.Item>
-        <Form.Item
-          label="Prénom"
-          name="firstName"
-          rules={[{ required: true, message: "Prénom requis" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Nom"
-          name="lastName"
-          rules={[{ required: true, message: "Nom requis" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Surnom" name="surname">
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Genre"
-          name="gender"
-          rules={[{ required: true, message: "Genre requis" }]}
-        >
-          <Select placeholder="Sélectionner">
-            <Select.Option value="M">Masculin</Select.Option>
-            <Select.Option value="F">Féminin</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="Téléphone"
-          name="phone"
-          rules={[{ required: true, message: "Téléphone requis" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Autre téléphone" name="otherPhone">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Bloqué" name="blocked" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <Form.Item label="Pays" name="country">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Province" name="province">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Ville" name="city">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Adresse" name="address">
-          <Input />
-        </Form.Item>
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={createMutation.isPending || updateMutation.isPending}
-            block
-          >
-            {isEdit ? "Enregistrer" : "Créer"}
-          </Button>
-        </Form.Item>
-      </Form>
+      <Form.Item label="Numéro de compte" name="accountNumber">
+        <Input disabled={isEdit} />
+      </Form.Item>
+      <Form.Item
+        label="Prénom"
+        name="firstName"
+        rules={[{ required: true, message: "Prénom requis" }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item
+        label="Nom"
+        name="lastName"
+        rules={[{ required: true, message: "Nom requis" }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item label="Surnom" name="surname">
+        <Input />
+      </Form.Item>
+      <Form.Item
+        label="Genre"
+        name="gender"
+        rules={[{ required: true, message: "Genre requis" }]}
+      >
+        <Select placeholder="Sélectionner" options={[
+          { value: "M", label: "Masculin" },
+          { value: "F", label: "Féminin" },
+        ]} />
+      </Form.Item>
+      <Form.Item
+        label="Téléphone"
+        name="phone"
+        rules={[{ required: true, message: "Téléphone requis" }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item label="Autre téléphone" name="otherPhone">
+        <Input />
+      </Form.Item>
+      <Form.Item label="Bloqué" name="blocked" valuePropName="checked">
+        <Switch />
+      </Form.Item>
+      <Form.Item label="Pays" name="country">
+        <Input />
+      </Form.Item>
+      <Form.Item label="Province" name="province">
+        <Input />
+      </Form.Item>
+      <Form.Item label="Ville" name="city">
+        <Input />
+      </Form.Item>
+      <Form.Item label="Adresse" name="address">
+        <Input />
+      </Form.Item>
     </Modal>
   );
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const transactionCreateSchema = z.object({
+const transactionBaseSchema = z.object({
   date: z.string().datetime().or(z.date()),
   amount: z.number().positive("Le montant doit être positif"),
   goldQuantity: z.string().optional(),
@@ -8,11 +8,21 @@ export const transactionCreateSchema = z.object({
   message: z.string().default(""),
   type: z.enum(["DEPOSIT", "WITHDRAWAL", "TRANSFER"]),
   accountId: z.string().min(1, "Compte requis"),
+  fromAccountId: z.string().optional(),
+  toAccountId: z.string().optional(),
 });
 
-export const transactionUpdateSchema = transactionCreateSchema.partial().extend({
-  accountId: z.string().optional(),
-});
+export const transactionCreateSchema = transactionBaseSchema.refine(
+  (data) => {
+    if (data.type === "TRANSFER") {
+      return !!data.fromAccountId && !!data.toAccountId && data.fromAccountId !== data.toAccountId;
+    }
+    return true;
+  },
+  { message: "fromAccountId et toAccountId sont requis et doivent être différents pour un TRANSFER" }
+);
+
+export const transactionUpdateSchema = transactionBaseSchema.partial();
 
 export type TransactionCreateInput = z.infer<typeof transactionCreateSchema>;
 export type TransactionUpdateInput = z.infer<typeof transactionUpdateSchema>;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { companyCreateSchema } from "@/lib/schemas/company";
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     const parsed = companyCreateSchema.safeParse(body.company);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid company data", details: parsed.error.flatten() },
+        { error: "Invalid company data", details: z.flattenError(parsed.error) },
         { status: 400 }
       );
     }

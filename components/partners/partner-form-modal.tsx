@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal, Form, Input, Button, message } from "antd";
+import { Modal, Form, Input, message } from "antd";
 import { useEffect } from "react";
 import {
   useCreatePartner,
@@ -23,23 +23,32 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
     if (open && isEdit && partner) {
       form.setFieldsValue(partner);
     }
-    if (!open) {
-      form.resetFields();
-    }
   }, [open, isEdit, partner, form]);
 
-  const handleSubmit = async (values: any) => {
-    try {
-      if (isEdit) {
-        await updateMutation.mutateAsync({ id: partner.id, data: values });
-        message.success("Partenaire mis à jour");
-      } else {
-        await createMutation.mutateAsync(values);
-        message.success("Partenaire créé");
-      }
-      onClose();
-    } catch {
-      message.error("Échec de l'opération");
+  const handleSubmit = (values: any) => {
+    if (isEdit) {
+      updateMutation.mutate(
+        { id: partner.id, data: values },
+        {
+          onSuccess: () => {
+            message.success("Partenaire mis à jour");
+            onClose();
+          },
+          onError: () => {
+            message.error("Échec de l'opération");
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          message.success("Partenaire créé");
+          onClose();
+        },
+        onError: () => {
+          message.error("Échec de l'opération");
+        },
+      });
     }
   };
 
@@ -48,33 +57,30 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
       title={isEdit ? "Modifier le partenaire" : "Nouveau partenaire"}
       open={open}
       onCancel={onClose}
-      footer={null}
-      destroyOnClose
+      okText={isEdit ? "Enregistrer" : "Créer"}
+      cancelText="Annuler"
+      okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
+      destroyOnHidden
+      modalRender={(dom) => (
+        <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending}>
+          {dom}
+        </Form>
+      )}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item
-          label="Code"
-          name="code"
-          rules={[{ required: true, message: "Code requis" }]}
-        >
-          <Input disabled={isEdit} />
-        </Form.Item>
-        <Form.Item
-          label="Solde initial"
-          name="balance"
-          rules={[{ required: true, message: "Solde requis" }]}
-        >
-          <Input type="number" disabled={isEdit} />
-        </Form.Item>
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={createMutation.isPending || updateMutation.isPending}
-          block
-        >
-          {isEdit ? "Enregistrer" : "Créer"}
-        </Button>
-      </Form>
+      <Form.Item
+        label="Code"
+        name="code"
+        rules={[{ required: true, message: "Code requis" }]}
+      >
+        <Input disabled={isEdit} />
+      </Form.Item>
+      <Form.Item
+        label="Solde initial"
+        name="balance"
+        rules={[{ required: true, message: "Solde requis" }]}
+      >
+        <Input type="number" disabled={isEdit} />
+      </Form.Item>
     </Modal>
   );
 }

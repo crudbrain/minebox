@@ -15,9 +15,9 @@ const { Sider } = Layout;
 
 const menuItems = [
   {
-    key: "/ws/dashboard",
+    key: "/ws",
     icon: <DashboardOutlined />,
-    label: <Link href="/ws/dashboard">Dashboard</Link>,
+    label: <Link href="/ws">Dashboard</Link>,
   },
   {
     key: "/ws/bank-accounts",
@@ -31,8 +31,10 @@ const menuItems = [
   },
 ];
 
-export function Sidebar() {
-  const { data: company, isLoading } = useCompany();
+export function Sidebar({ company: companyProp }: { company?: any }) {
+  const { data: companyFromHook, isLoading: hookLoading } = useCompany();
+  const company = companyProp ?? companyFromHook;
+  const isLoading = companyProp ? false : hookLoading;
   const pathname = usePathname();
 
   return (

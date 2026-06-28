@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { transactionUpdateSchema } from "@/lib/schemas/transaction";
@@ -22,7 +23,7 @@ export async function PUT(
     const parsed = transactionUpdateSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: parsed.error.flatten() },
+        { error: "Invalid data", details: z.flattenError(parsed.error) },
         { status: 400 }
       );
     }
@@ -102,19 +103,41 @@ export async function DELETE(
       );
     }
 
-    let balanceAdjustment = 0;
-    if (existing.type === "DEPOSIT") balanceAdjustment -= existing.amount;
-    else balanceAdjustment += existing.amount;
+    // If this is a paired TRANSFER, also handle the other transaction
+    const pairedIds: string[] = [];
+    if (existing.transferGroupId) {
+      const paired = await prisma.transaction.findMany({
+        where: { transferGroupId: existing.transferGroupId, deleted: false },
+      });
+      pairedIds.push(...paired.map((t) => t.id));
+    }
+    const uniqueIds = Array.from(new Set([id, ...pairedIds]));
 
     await prisma.$transaction(async (tx) => {
-      await tx.transaction.update({
-        where: { id },
-        data: { deleted: true },
-      });
-      await tx.bankAccount.update({
-        where: { id: existing.accountId },
-        data: { balance: { increment: balanceAdjustment } },
-      });
+      for (const txId of uniqueIds) {
+        const txRecord = await tx.transaction.findUnique({
+          where: { id: txId },
+          include: { account: true },
+        });
+        if (!txRecord || txRecord.deleted) continue;
+
+        let balanceAdjustment = 0;
+        if (txRecord.type === "DEPOSIT") balanceAdjustment -= txRecord.amount;
+        else if (txRecord.type === "WITHDRAWAL") balanceAdjustment += txRecord.amount;
+        else if (txRecord.type === "TRANSFER") {
+          if (txRecord.accountId === txRecord.fromAccountId) balanceAdjustment += txRecord.amount;
+          else if (txRecord.accountId === txRecord.toAccountId) balanceAdjustment -= txRecord.amount;
+        }
+
+        await tx.transaction.update({
+          where: { id: txId },
+          data: { deleted: true },
+        });
+        await tx.bankAccount.update({
+          where: { id: txRecord.accountId },
+          data: { balance: { increment: balanceAdjustment } },
+        });
+      }
     });
 
     return NextResponse.json({ success: true });

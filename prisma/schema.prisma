@@ -130,45 +130,52 @@ model Company {
 }
 
 model BankAccount {
-  id            String        @id @default(cuid())
-  accountNumber String        @unique
-  balance       Float
-  avatar        String?
-  firstName     String        @map("first_name")
-  lastName      String        @map("last_name")
-  surname       String?       @default("")
-  gender        Gender
-  phone         String        @unique
-  otherPhone    String?       @default("")
-  blocked       Boolean       @default(false)
-  country       String?       @default("")
-  province      String?       @default("")
-  city          String?       @default("")
-  address       String?       @default("")
-  createdBy     User?         @relation("user_creator", fields: [createdById], references: [id])
-  createdById   String?       @map("created_by_id")
-  transactions  Transaction[]
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
+  id                String        @id @default(cuid())
+  accountNumber     String        @unique
+  balance           Float
+  avatar            String?
+  firstName         String        @map("first_name")
+  lastName          String        @map("last_name")
+  surname           String?       @default("")
+  gender            Gender
+  phone             String        @unique
+  otherPhone        String?       @default("")
+  blocked           Boolean       @default(false)
+  country           String?       @default("")
+  province          String?       @default("")
+  city              String?       @default("")
+  address           String?       @default("")
+  createdBy         User?         @relation("user_creator", fields: [createdById], references: [id])
+  createdById       String?       @map("created_by_id")
+  transactions      Transaction[] @relation("transaction_account")
+  fromTransactions  Transaction[] @relation("transaction_from")
+  toTransactions    Transaction[] @relation("transaction_to")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
 
   @@map("bank_account")
 }
 
 model Transaction {
-  id           String          @id @default(cuid())
-  date         DateTime
-  amount       Float
-  goldQuantity String?         @default("")
-  title        String?         @default("")
-  message      String          @default("")
-  type         TransactionType
-  account      BankAccount     @relation(fields: [accountId], references: [id])
-  accountId    String          @map("account_id")
-  operator     User            @relation("transaction_operator", fields: [operatorId], references: [id])
-  operatorId   String          @map("operator_id")
-  deleted      Boolean         @default(false)
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt @map("updated_at")
+  id              String          @id @default(cuid())
+  date            DateTime
+  amount          Float
+  goldQuantity    String?         @default("")
+  title           String?         @default("")
+  message         String          @default("")
+  type            TransactionType
+  account         BankAccount     @relation("transaction_account", fields: [accountId], references: [id])
+  accountId       String          @map("account_id")
+  fromAccount     BankAccount?    @relation("transaction_from", fields: [fromAccountId], references: [id])
+  fromAccountId   String?         @map("from_account_id")
+  toAccount       BankAccount?    @relation("transaction_to", fields: [toAccountId], references: [id])
+  toAccountId     String?         @map("to_account_id")
+  transferGroupId String?         @map("transfer_group_id")
+  operator        User            @relation("transaction_operator", fields: [operatorId], references: [id])
+  operatorId      String          @map("operator_id")
+  deleted         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
 
   @@map("transaction")
 }
