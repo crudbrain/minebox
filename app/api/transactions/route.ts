@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, Number(searchParams.get("page") || "1"));
-    const pageSize = Math.max(1, Math.min(100, Number(searchParams.get("pageSize") || "10")));
+    const pageSize = Math.max(1, Math.min(99999, Number(searchParams.get("pageSize") || "10")));
     const accountId = searchParams.get("accountId") || undefined;
     const type = searchParams.get("type") || undefined;
     const dateFrom = searchParams.get("dateFrom") || undefined;

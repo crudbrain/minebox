@@ -1,20 +1,24 @@
 'use client';
 
 import { Table, Button, Modal, Form, Input, Select, DatePicker, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { useState, useMemo, useCallback } from "react";
+import { PlusOutlined, PrinterOutlined } from "@ant-design/icons";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import dayjs from "dayjs";
 import { useQueryState } from "nuqs";
+import { useReactToPrint } from "react-to-print";
 import {
   useTransfers,
   useCreateTransfer,
   useUpdateTransfer,
   useDeleteTransfer,
 } from "@/lib/hooks/use-transfers";
+import { usePartner } from "@/lib/hooks/use-partners";
+import { useCompany } from "@/lib/hooks/use-company";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
-import { useCompany } from "@/lib/hooks/use-company";
 import { TransferDetailDrawer } from "./transfer-detail-drawer";
+
+const { RangePicker } = DatePicker;
 
 interface PartnerTransfersProps {
   partnerId: string;
@@ -22,34 +26,82 @@ interface PartnerTransfersProps {
 
 export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
   const { data: company } = useCompany();
+  const { data: partner } = usePartner(partnerId);
   const [form] = Form.useForm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTransfer, setEditingTransfer] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [selectedTransfer, setSelectedTransfer] = useState<any>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
+  const [printData, setPrintData] = useState<any[] | null>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const [page, setPage] = useQueryState("page", {
+    defaultValue: 1,
     parse: (v) => Math.max(1, Number(v) || 1),
     serialize: String,
   });
   const [pageSize, setPageSize] = useQueryState("pageSize", {
+    defaultValue: 10,
     parse: (v) => Math.max(1, Number(v) || 10),
     serialize: String,
   });
 
-  const currentPage = page || 1;
-  const currentPageSize = pageSize || 10;
+  const dateFrom = dateRange?.[0]?.toISOString();
+  const dateTo = dateRange?.[1]?.toISOString();
 
   const { data, isLoading } = useTransfers({
-    page: currentPage,
-    pageSize: currentPageSize,
+    page: page,
+    pageSize: pageSize,
     partnerId,
+    dateFrom,
+    dateTo,
   });
 
   const createMutation = useCreateTransfer();
   const updateMutation = useUpdateTransfer();
   const deleteMutation = useDeleteTransfer();
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+  });
+
+  const handlePrintClick = async () => {
+    setIsPrinting(true);
+    try {
+      const sp = new URLSearchParams();
+      sp.set("page", "1");
+      sp.set("pageSize", "99999");
+      sp.set("partnerId", partnerId);
+      if (dateFrom) sp.set("dateFrom", dateFrom);
+      if (dateTo) sp.set("dateTo", dateTo);
+      const res = await fetch(`/api/transfers?${sp}`);
+      if (!res.ok) throw new Error("Failed to fetch transfers for print");
+      const json = await res.json();
+      setPrintData(json.data || []);
+    } catch {
+      message.error("Échec du chargement des données pour l'impression");
+      setIsPrinting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (printData !== null) {
+      const timer = setTimeout(() => {
+        handlePrint();
+        setIsPrinting(false);
+        setPrintData(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [printData, handlePrint]);
+
+  const handleDateRangeChange = (dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null) => {
+    setDateRange(dates);
+    setPage(1);
+  };
 
   const handleSubmit = (values: any) => {
     const payload = {
@@ -109,63 +161,100 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         render: (date: string) => formatDate(date),
       },
       {
-        title: "Type",
-        dataIndex: "type",
-        key: "type",
-      },
-      {
-        title: "Montant",
-        dataIndex: "amount",
-        key: "amount",
-        render: (amount: number) =>
-          formatCurrency(amount, company?.currency),
-      },
-      {
-        title: "Quantité d'or",
-        dataIndex: "goldQuantity",
-        key: "goldQuantity",
-        render: (v: string) => v || "-",
-      },
-      {
         title: "Expéditeur",
         dataIndex: "sender",
         key: "sender",
       },
       {
-        title: "Message",
-        dataIndex: "message",
-        key: "message",
+        title: "Entrée",
+        key: "entry",
+        render: (_: any, record: any) =>
+          record.type === "GOLD_TRANSFER"
+            ? formatCurrency(record.amount, company?.currency)
+            : "-",
       },
       {
-        title: "Opérateur",
-        key: "operator",
-        render: (_: any, record: any) => record.operator?.name || "-",
+        title: "Sortie",
+        key: "exit",
+        render: (_: any, record: any) =>
+          record.type === "MONEY_TRANSFER"
+            ? formatCurrency(record.amount, company?.currency)
+            : "-",
       },
       {
-        title: "Solde après",
+        title: "Qté Or",
+        dataIndex: "goldQuantity",
+        key: "goldQuantity",
+        render: (v: string) => v || "-",
+      },
+      {
+        title: "Type de transfert",
+        key: "type",
+        render: (_: any, record: any) =>
+          record.type === "GOLD_TRANSFER"
+            ? "Transfert d'or"
+            : record.type === "MONEY_TRANSFER"
+            ? "Transfert d'argent"
+            : record.type,
+      },
+      {
+        title: "Solde",
         dataIndex: "balanceAfter",
         key: "balanceAfter",
         render: (balanceAfter: number) =>
           formatCurrency(balanceAfter, company?.currency),
       },
+      {
+        title: "Note",
+        dataIndex: "message",
+        key: "message",
+        render: (v: string) => v || "-",
+      },
     ],
     [company?.currency]
   );
 
+  const printTitle = "Historique des transferts";
+  const printSubtitle = useMemo(() => {
+    const parts: string[] = [];
+    if (partner) {
+      parts.push(`Partenaire ${partner.code}`);
+    }
+    if (dateRange?.[0] && dateRange?.[1]) {
+      parts.push(`Période : ${formatDate(dateRange[0].toISOString())} - ${formatDate(dateRange[1].toISOString())}`);
+    }
+    return parts.join(" — ");
+  }, [partner, dateRange]);
+
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setEditingTransfer(null);
-            form.resetFields();
-            setModalOpen(true);
-          }}
-        >
-          Nouveau transfert
-        </Button>
+      <div className="flex justify-between items-center mb-4">
+        <RangePicker
+          allowClear
+          placeholder={["Date début", "Date fin"]}
+          value={dateRange}
+          onChange={handleDateRangeChange}
+        />
+        <div className="flex gap-2">
+          <Button
+            icon={<PrinterOutlined />}
+            onClick={handlePrintClick}
+            loading={isPrinting}
+          >
+            Imprimer
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setEditingTransfer(null);
+              form.resetFields();
+              setModalOpen(true);
+            }}
+          >
+            Nouveau transfert
+          </Button>
+        </div>
       </div>
       <Table
         columns={columns}
@@ -180,12 +269,12 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
           style: { cursor: "pointer" },
         })}
         pagination={{
-          current: currentPage,
-          pageSize: currentPageSize,
+          current: page,
+          pageSize: pageSize,
           total: data?.total || 0,
           onChange: (p, ps) => {
             setPage(p);
-            if (ps !== currentPageSize) setPageSize(ps);
+            if (ps !== pageSize) setPageSize(ps);
           },
         }}
       />
@@ -274,6 +363,64 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         entityName="le transfert"
         loading={deleteMutation.isPending}
       />
+
+      {/* Printable section */}
+      <div
+        ref={printRef}
+        className="print-section"
+        style={{ position: "fixed", left: -9999, top: 0, width: "100%", background: "#fff", padding: 24 }}
+      >
+        <div className="print-only-header" style={{ display: "none", marginBottom: 24 }}>
+          {company?.logo && (
+            <img
+              src={company.logo}
+              alt={company.name}
+              style={{ height: 48, marginBottom: 8 }}
+            />
+          )}
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>
+            {company?.name}
+          </h2>
+        </div>
+
+        <h1 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700 }}>
+          {printTitle}
+        </h1>
+        {printSubtitle && (
+          <p style={{ margin: "0 0 16px", fontSize: 14, color: "#555" }}>
+            {printSubtitle}
+          </p>
+        )}
+
+        <Table
+          columns={columns}
+          dataSource={printData || []}
+          rowKey="id"
+          pagination={false}
+          bordered
+          size="small"
+        />
+      </div>
+
+      <style>{`
+        @media print {
+          .print-only-header {
+            display: block !important;
+          }
+          body * {
+            visibility: hidden;
+          }
+          .print-section, .print-section * {
+            visibility: visible;
+          }
+          .print-section {
+            position: static !important;
+            left: auto !important;
+            top: auto !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,10 +1,13 @@
 'use client';
 
-import { Descriptions, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Descriptions, Button, Card } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
+import { useDeletePartner } from "@/lib/hooks/use-partners";
+import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 import { PartnerFormModal } from "./partner-form-modal";
 
 interface PartnerDetailProps {
@@ -13,7 +16,16 @@ interface PartnerDetailProps {
 
 export function PartnerDetail({ partner }: PartnerDetailProps) {
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const { data: company } = useCompany();
+  const router = useRouter();
+  const deleteMutation = useDeletePartner();
+
+  const handleDelete = () => {
+    deleteMutation.mutate(partner.id, {
+      onSuccess: () => router.push('/ws/partners'),
+    });
+  };
 
   return (
     <div>
@@ -35,10 +47,28 @@ export function PartnerDetail({ partner }: PartnerDetailProps) {
         </Descriptions.Item>
       </Descriptions>
 
+      <Card
+        style={{ borderColor: '#ffccc7', backgroundColor: '#fff2f0', marginTop: 24 }}
+        title={<span style={{ color: '#cf1322' }}>Zone danger</span>}
+      >
+        <p>Supprimer ce partenaire. Cette action est irréversible.</p>
+        <Button danger icon={<DeleteOutlined />} onClick={() => setDeleteOpen(true)}>
+          Supprimer
+        </Button>
+      </Card>
+
       <PartnerFormModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
         partner={partner}
+      />
+
+      <ConfirmDeleteModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDelete}
+        entityName={`le partenaire "${partner.code}"`}
+        loading={deleteMutation.isPending}
       />
     </div>
   );

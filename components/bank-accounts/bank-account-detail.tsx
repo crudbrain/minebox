@@ -1,10 +1,13 @@
 'use client';
 
-import { Descriptions, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Descriptions, Button, Card, Switch, Modal, message } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
+import { useDeleteBankAccount, useUpdateBankAccount } from "@/lib/hooks/use-bank-accounts";
+import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 import { BankAccountFormModal } from "./bank-account-form-modal";
 
 interface BankAccountDetailProps {
@@ -13,7 +16,35 @@ interface BankAccountDetailProps {
 
 export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingBlocked, setPendingBlocked] = useState<boolean | null>(null);
   const { data: company } = useCompany();
+  const router = useRouter();
+  const deleteMutation = useDeleteBankAccount();
+  const updateMutation = useUpdateBankAccount();
+
+  const handleDelete = () => {
+    deleteMutation.mutate(bankAccount.id, {
+      onSuccess: () => router.push('/ws/bank-accounts'),
+    });
+  };
+
+  const handleStatusChange = () => {
+    if (pendingBlocked === null) return;
+    updateMutation.mutate(
+      { id: bankAccount.id, data: { blocked: pendingBlocked } },
+      {
+        onSuccess: () => {
+          message.success(pendingBlocked ? "Compte bloqué" : "Compte activé");
+          setConfirmOpen(false);
+        },
+        onError: () => {
+          message.error("Échec de l'opération");
+        },
+      }
+    );
+  };
 
   return (
     <div>
@@ -46,7 +77,13 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
           {bankAccount.otherPhone || "-"}
         </Descriptions.Item>
         <Descriptions.Item label="Statut">
-          {bankAccount.blocked ? "Bloqué" : "Actif"}
+          <Switch
+            checked={bankAccount.blocked}
+            loading={updateMutation.isPending}
+            onChange={(checked) => { setPendingBlocked(checked); setConfirmOpen(true); }}
+            checkedChildren="Bloqué"
+            unCheckedChildren="Actif"
+          />
         </Descriptions.Item>
         <Descriptions.Item label="Pays">
           {bankAccount.country || "-"}
@@ -65,11 +102,44 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         </Descriptions.Item>
       </Descriptions>
 
+      <Card
+        style={{ borderColor: '#ffccc7', backgroundColor: '#fff2f0', marginTop: 24 }}
+        title={<span style={{ color: '#cf1322' }}>Zone danger</span>}
+      >
+        <p>Supprimer ce compte bancaire. Cette action est irréversible.</p>
+        <Button danger icon={<DeleteOutlined />} onClick={() => setDeleteOpen(true)}>
+          Supprimer
+        </Button>
+      </Card>
+
       <BankAccountFormModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
         bankAccount={bankAccount}
       />
+
+      <ConfirmDeleteModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDelete}
+        entityName={`le compte bancaire "${bankAccount.accountNumber}"`}
+        loading={deleteMutation.isPending}
+      />
+
+      <Modal
+        centered
+        open={confirmOpen}
+        onOk={handleStatusChange}
+        onCancel={() => setConfirmOpen(false)}
+        okText="Confirmer"
+        cancelText="Annuler"
+        okButtonProps={{ loading: updateMutation.isPending }}
+      >
+        <p>
+          Voulez-vous {pendingBlocked ? "bloquer" : "activer"} le compte N° {bankAccount.accountNumber} ?
+          Cette action peut être annulée à tout moment.
+        </p>
+      </Modal>
     </div>
   );
 }

@@ -1,70 +1,81 @@
 'use client';
 
-import { Table, Input, Button, Space } from "antd";
-import { SearchOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Table, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { usePartners } from "@/lib/hooks/use-partners";
 import { formatCurrency } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
+import { memo, useMemo, useCallback } from "react";
 
-export function PartnerTable() {
+interface PartnerRecord {
+  id: string;
+  code: string;
+  balance: number;
+}
+
+export const PartnerTable = memo(function PartnerTable() {
   const router = useRouter();
   const { data: company } = useCompany();
   const [search, setSearch] = useQueryState("search");
   const [page, setPage] = useQueryState("page", {
+    defaultValue: 1,
     parse: (v) => Math.max(1, Number(v) || 1),
     serialize: String,
   });
   const [pageSize, setPageSize] = useQueryState("pageSize", {
+    defaultValue: 10,
     parse: (v) => Math.max(1, Number(v) || 10),
     serialize: String,
   });
 
-  const currentPage = page || 1;
-  const currentPageSize = pageSize || 10;
-
   const { data, isLoading } = usePartners({
-    page: currentPage,
-    pageSize: currentPageSize,
+    page: page,
+    pageSize: pageSize,
     search: search || undefined,
   });
 
-  const columns = [
-    {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
+  const columns = useMemo(
+    () => [
+      {
+        title: "Code",
+        dataIndex: "code",
+        key: "code",
+      },
+      {
+        title: "Solde",
+        dataIndex: "balance",
+        key: "balance",
+        render: (balance: number) => formatCurrency(balance, company?.currency),
+      },
+    ],
+    [company?.currency]
+  );
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(e.target.value || null);
+      setPage(1);
     },
-    {
-      title: "Solde",
-      dataIndex: "balance",
-      key: "balance",
-      render: (balance: number) => formatCurrency(balance, company?.currency),
+    [setSearch, setPage]
+  );
+
+  const handlePaginationChange = useCallback(
+    (p: number, ps: number) => {
+      setPage(p);
+      if (ps !== pageSize) setPageSize(ps);
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_: any, record: any) => (
-        <Space>
-          <Button
-            icon={<EditOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/ws/partners/${record.id}`);
-            }}
-          />
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          />
-        </Space>
-      ),
-    },
-  ];
+    [setPage, setPageSize, pageSize]
+  );
+
+  const handleRowClick = useCallback(
+    (record: PartnerRecord) => ({
+      onClick: () => router.push(`/ws/partners/${record.id}`),
+      className: "cursor-pointer",
+    }),
+    [router]
+  );
 
   return (
     <div>
@@ -73,10 +84,7 @@ export function PartnerTable() {
           placeholder="Rechercher..."
           prefix={<SearchOutlined />}
           value={search || ""}
-          onChange={(e) => {
-            setSearch(e.target.value || null);
-            setPage(1);
-          }}
+          onChange={handleSearchChange}
           allowClear
         />
       </div>
@@ -86,19 +94,13 @@ export function PartnerTable() {
         loading={isLoading}
         rowKey="id"
         pagination={{
-          current: currentPage,
-          pageSize: currentPageSize,
+          current: page,
+          pageSize: pageSize,
           total: data?.total || 0,
-          onChange: (p, ps) => {
-            setPage(p);
-            if (ps !== currentPageSize) setPageSize(ps);
-          },
+          onChange: handlePaginationChange,
         }}
-        onRow={(record) => ({
-          onClick: () => router.push(`/ws/partners/${record.id}`),
-          className: "cursor-pointer",
-        })}
+        onRow={handleRowClick}
       />
     </div>
   );
-}
+});
