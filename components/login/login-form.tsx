@@ -1,7 +1,6 @@
 "use client";
 
 import { Form, Input, Button, Card, Typography, message } from "antd";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
@@ -12,7 +11,6 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ hasCompany }: LoginFormProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: { email: string; password: string }) => {
@@ -26,7 +24,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
         message.error(result.error.message || "Échec de la connexion");
       } else {
         message.success("Connexion réussie");
-        router.push("/ws");
+        window.location.href = "/ws";
       }
     } catch {
       message.error("Échec de la connexion");
@@ -39,7 +37,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-full max-w-md">
         <Title level={3} className="text-center">Minebox</Title>
-        <Form layout="vertical" onFinish={onFinish}>
+        <Form layout="vertical" onFinish={onFinish} disabled={loading}>
           <Form.Item
             label="Email"
             name="email"
@@ -54,7 +52,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
           >
             <Input.Password />
           </Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
+          <Button type="primary" htmlType="submit" loading={loading} disabled={loading} block>
             Se connecter
           </Button>
         </Form>

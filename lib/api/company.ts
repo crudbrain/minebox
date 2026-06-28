@@ -1,3 +1,5 @@
+import { CompanyUpdateInput } from "@/lib/schemas/company";
+
 export async function getCompany() {
   const res = await fetch("/api/company");
   if (!res.ok) throw new Error("Failed to fetch company");
@@ -11,5 +13,18 @@ export async function createCompany(data: { company: any; admin: any }) {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Failed to create company");
+  return res.json();
+}
+
+export async function updateCompany(data: CompanyUpdateInput) {
+  const res = await fetch("/api/company", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to update company");
+  }
   return res.json();
 }

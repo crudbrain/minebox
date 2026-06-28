@@ -1,7 +1,7 @@
 'use client';
 
-import { Table, Button, Space, Modal, Form, Input, Select, DatePicker, message } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Form, Input, Select, DatePicker, message } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useState, useMemo, useCallback } from "react";
 import dayjs from "dayjs";
 import { useQueryState } from "nuqs";
@@ -14,6 +14,8 @@ import {
 import { useBankAccounts } from "@/lib/hooks/use-bank-accounts";
 import { useCompany } from "@/lib/hooks/use-company";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
+import { TransactionDetailDrawer } from "./transaction-detail-drawer";
 
 interface BankAccountTransactionsProps {
   accountId: string;
@@ -26,6 +28,9 @@ export function BankAccountTransactions({
   const [form] = Form.useForm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const transactionType = Form.useWatch("type", form);
 
   const [page, setPage] = useQueryState("page", {
@@ -109,6 +114,7 @@ export function BankAccountTransactions({
       deleteMutation.mutate(id, {
         onSuccess: () => {
           message.success("Transaction supprimée");
+          setDeleteTarget(null);
         },
         onError: () => {
           message.error("Échec de la suppression");
@@ -183,33 +189,8 @@ export function BankAccountTransactions({
         render: (balanceAfter: number) =>
           formatCurrency(balanceAfter, company?.currency),
       },
-      {
-        title: "Actions",
-        key: "actions",
-        render: (_: any, record: any) => (
-          <Space>
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => {
-                setEditingTransaction(record);
-                form.setFieldsValue({
-                  ...record,
-                  date: dayjs(record.date),
-                });
-                setModalOpen(true);
-              }}
-            />
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record.id)}
-              loading={deleteMutation.isPending}
-            />
-          </Space>
-        ),
-      },
     ],
-    [company?.currency, deleteMutation.isPending, handleDelete]
+    [company?.currency]
   );
 
   return (
@@ -232,6 +213,13 @@ export function BankAccountTransactions({
         dataSource={data?.data || []}
         loading={isLoading}
         rowKey="id"
+        onRow={(record) => ({
+          onClick: () => {
+            setSelectedTransaction(record);
+            setDrawerOpen(true);
+          },
+          style: { cursor: "pointer" },
+        })}
         pagination={{
           current: currentPage,
           pageSize: currentPageSize,
@@ -240,6 +228,28 @@ export function BankAccountTransactions({
             setPage(p);
             if (ps !== currentPageSize) setPageSize(ps);
           },
+        }}
+      />
+
+      <TransactionDetailDrawer
+        open={drawerOpen}
+        transaction={selectedTransaction}
+        onClose={() => {
+          setDrawerOpen(false);
+          setSelectedTransaction(null);
+        }}
+        accountId={accountId}
+        onEdit={(record) => {
+          setEditingTransaction(record);
+          form.setFieldsValue({
+            ...record,
+            date: dayjs(record.date),
+          });
+          setDrawerOpen(false);
+          setModalOpen(true);
+        }}
+        onDelete={(record) => {
+          setDeleteTarget(record);
         }}
       />
 
@@ -255,7 +265,7 @@ export function BankAccountTransactions({
         okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
         destroyOnHidden
         modalRender={(dom) => (
-          <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}>
+          <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending}>
             {dom}
           </Form>
         )}
@@ -320,6 +330,14 @@ export function BankAccountTransactions({
           </>
         )}
       </Modal>
+
+      <ConfirmDeleteModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => { handleDelete(deleteTarget.id); }}
+        entityName={`la transaction "${deleteTarget?.title || deleteTarget?.id}"`}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

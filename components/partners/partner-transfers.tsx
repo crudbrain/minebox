@@ -1,7 +1,7 @@
 'use client';
 
-import { Table, Button, Space, Modal, Form, Input, Select, DatePicker, message } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Table, Button, Modal, Form, Input, Select, DatePicker, message } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useState, useMemo, useCallback } from "react";
 import dayjs from "dayjs";
 import { useQueryState } from "nuqs";
@@ -12,7 +12,9 @@ import {
   useDeleteTransfer,
 } from "@/lib/hooks/use-transfers";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 import { useCompany } from "@/lib/hooks/use-company";
+import { TransferDetailDrawer } from "./transfer-detail-drawer";
 
 interface PartnerTransfersProps {
   partnerId: string;
@@ -23,6 +25,9 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
   const [form] = Form.useForm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTransfer, setEditingTransfer] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [selectedTransfer, setSelectedTransfer] = useState<any>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [page, setPage] = useQueryState("page", {
     parse: (v) => Math.max(1, Number(v) || 1),
@@ -85,6 +90,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
       deleteMutation.mutate(id, {
         onSuccess: () => {
           message.success("Transfert supprimé");
+          setDeleteTarget(null);
         },
         onError: () => {
           message.error("Échec de la suppression");
@@ -142,33 +148,8 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         render: (balanceAfter: number) =>
           formatCurrency(balanceAfter, company?.currency),
       },
-      {
-        title: "Actions",
-        key: "actions",
-        render: (_: any, record: any) => (
-          <Space>
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => {
-                setEditingTransfer(record);
-                form.setFieldsValue({
-                  ...record,
-                  date: dayjs(record.date),
-                });
-                setModalOpen(true);
-              }}
-            />
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record.id)}
-              loading={deleteMutation.isPending}
-            />
-          </Space>
-        ),
-      },
     ],
-    [company?.currency, deleteMutation.isPending, handleDelete]
+    [company?.currency]
   );
 
   return (
@@ -191,6 +172,13 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         dataSource={data?.data || []}
         loading={isLoading}
         rowKey="id"
+        onRow={(record) => ({
+          onClick: () => {
+            setSelectedTransfer(record);
+            setDrawerOpen(true);
+          },
+          style: { cursor: "pointer" },
+        })}
         pagination={{
           current: currentPage,
           pageSize: currentPageSize,
@@ -199,6 +187,27 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
             setPage(p);
             if (ps !== currentPageSize) setPageSize(ps);
           },
+        }}
+      />
+
+      <TransferDetailDrawer
+        open={drawerOpen}
+        transfer={selectedTransfer}
+        onClose={() => {
+          setDrawerOpen(false);
+          setSelectedTransfer(null);
+        }}
+        onEdit={(record) => {
+          setEditingTransfer(record);
+          form.setFieldsValue({
+            ...record,
+            date: dayjs(record.date),
+          });
+          setDrawerOpen(false);
+          setModalOpen(true);
+        }}
+        onDelete={(record) => {
+          setDeleteTarget(record);
         }}
       />
 
@@ -214,7 +223,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
         destroyOnHidden
         modalRender={(dom) => (
-          <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}>
+          <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending}>
             {dom}
           </Form>
         )}
@@ -257,6 +266,14 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
           <Input.TextArea />
         </Form.Item>
       </Modal>
+
+      <ConfirmDeleteModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => { handleDelete(deleteTarget.id); }}
+        entityName="le transfert"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

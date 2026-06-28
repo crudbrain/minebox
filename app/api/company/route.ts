@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { companyCreateSchema } from "@/lib/schemas/company";
+import { companyCreateSchema, companyUpdateSchema } from "@/lib/schemas/company";
 
 export async function GET() {
   try {
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       data: parsed.data,
     });
 
-    await auth.api.signUpEmail({
+    const userResult = await auth.api.signUpEmail({
       body: {
         name: body.admin.name,
         email: body.admin.email,
@@ -50,11 +50,52 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await prisma.user.update({
+      where: { id: userResult.user.id },
+      data: { role: "admin" },
+    });
+
     return NextResponse.json(company, { status: 201 });
   } catch (error) {
     console.error("Setup error:", error);
     return NextResponse.json(
       { error: "Failed to create company or admin user" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const parsed = companyUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid company data", details: z.flattenError(parsed.error) },
+        { status: 400 }
+      );
+    }
+
+    const company = await prisma.company.findFirst();
+    if (!company) {
+      return NextResponse.json({ error: "Company not found" }, { status: 404 });
+    }
+
+    const updatedCompany = await prisma.company.update({
+      where: { id: company.id },
+      data: parsed.data,
+    });
+
+    return NextResponse.json(updatedCompany);
+  } catch (error) {
+    console.error("Company update error:", error);
+    return NextResponse.json(
+      { error: "Failed to update company" },
       { status: 500 }
     );
   }

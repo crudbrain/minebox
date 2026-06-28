@@ -5,37 +5,49 @@ import {
   DashboardOutlined,
   BankOutlined,
   TeamOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useCompany } from "@/lib/hooks/use-company";
+import { useSession } from "@/lib/hooks/use-session";
 import { UserDropdown } from "./user-dropdown";
 
 const { Sider } = Layout;
-
-const menuItems = [
-  {
-    key: "/ws",
-    icon: <DashboardOutlined />,
-    label: <Link href="/ws">Dashboard</Link>,
-  },
-  {
-    key: "/ws/bank-accounts",
-    icon: <BankOutlined />,
-    label: <Link href="/ws/bank-accounts">Banque et crédits</Link>,
-  },
-  {
-    key: "/ws/partners",
-    icon: <TeamOutlined />,
-    label: <Link href="/ws/partners">Partenaires et crédits</Link>,
-  },
-];
 
 export function Sidebar({ company: companyProp }: { company?: any }) {
   const { data: companyFromHook, isLoading: hookLoading } = useCompany();
   const company = companyProp ?? companyFromHook;
   const isLoading = companyProp ? false : hookLoading;
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const menuItems = [
+    {
+      key: "/ws",
+      icon: <DashboardOutlined />,
+      label: <Link href="/ws">Dashboard</Link>,
+    },
+    {
+      key: "/ws/bank-accounts",
+      icon: <BankOutlined />,
+      label: <Link href="/ws/bank-accounts">Banque et crédits</Link>,
+    },
+    {
+      key: "/ws/partners",
+      icon: <TeamOutlined />,
+      label: <Link href="/ws/partners">Partenaires et crédits</Link>,
+    },
+    ...(session?.user?.role === "admin"
+      ? [
+          {
+            key: "/ws/settings",
+            icon: <SettingOutlined />,
+            label: <Link href="/ws/settings">Paramètres</Link>,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <Sider
