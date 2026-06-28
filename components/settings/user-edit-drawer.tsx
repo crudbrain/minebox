@@ -53,7 +53,7 @@ export function UserEditDrawer({ open, onClose, user, onSuccess }: UserEditDrawe
   return (
     <Drawer
       title="Modifier l'utilisateur"
-      width={420}
+      size={420}
       open={open}
       onClose={() => {
         form.resetFields();

@@ -18,14 +18,6 @@ export default function BankAccountLayout({
   const { data: bankAccount, isLoading } = useBankAccount(id);
   const { data: company } = useCompany();
 
-  if (isLoading) {
-    return <Skeleton active paragraph={{ rows: 8 }} />;
-  }
-
-  if (!bankAccount) {
-    return <div>Compte non trouvé</div>;
-  }
-
   const tabs = useMemo(
     () => [
       { key: "transactions", label: "Transactions", path: `/ws/bank-accounts/${id}` },
@@ -33,6 +25,14 @@ export default function BankAccountLayout({
     ],
     [id]
   );
+
+  if (isLoading) {
+    return <Skeleton active paragraph={{ rows: 8 }} />;
+  }
+
+  if (!bankAccount) {
+    return <div>Compte non trouvé</div>;
+  }
 
   return (
     <div>

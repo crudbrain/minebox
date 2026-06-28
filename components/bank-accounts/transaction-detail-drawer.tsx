@@ -153,7 +153,7 @@ Compte: *${accountName}*
       title="Détails de la transaction"
       open={open}
       onClose={onClose}
-      width={480}
+      size={480}
       extra={
         <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">
           <Button icon={<MoreOutlined />} />

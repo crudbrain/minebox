@@ -370,7 +370,7 @@ export default function UsersPage() {
 
       <Drawer
         title={`Sessions de ${sessionsUser?.name || ""}`}
-        width={480}
+        size={480}
         open={!!sessionsUser}
         onClose={() => setSessionsUser(null)}
       >

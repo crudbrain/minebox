@@ -60,7 +60,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
   return (
     <Drawer
       title="Modifier l'entreprise"
-      width={520}
+      size={520}
       open={open}
       onClose={onClose}
       footer={
