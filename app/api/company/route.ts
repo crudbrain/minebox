@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { companyCreateSchema, companyUpdateSchema } from "@/lib/schemas/company";
+import { generateCompanyCode } from "@/lib/server/company";
 
 export async function GET() {
   try {
@@ -38,8 +39,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let code = body.company?.code;
+    if (!code) {
+      code = await generateCompanyCode();
+      if (!code) {
+        return NextResponse.json(
+          { error: "Generated code not unique, retry." },
+          { status: 409 }
+        );
+      }
+    }
+
     const company = await prisma.company.create({
-      data: parsed.data,
+      data: { ...parsed.data, code },
     });
 
     const userResult = await auth.api.signUpEmail({

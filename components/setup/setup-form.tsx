@@ -6,7 +6,7 @@ import { createCompany } from "@/lib/api/company";
 
 const { Title } = Typography;
 
-export function SetupForm() {
+export function SetupForm({ code }: { code: string }) {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
@@ -15,7 +15,7 @@ export function SetupForm() {
     try {
       await createCompany({
         company: {
-          code: values.code,
+          code,
           name: values.name,
           shortName: values.shortName,
           description: values.description,
@@ -52,7 +52,7 @@ export function SetupForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-layout py-8">
       <Card className="w-full max-w-lg">
-        <Title level={3} className="text-center">
+        <Title level={3}>
           Configuration
         </Title>
         <Form
@@ -62,13 +62,6 @@ export function SetupForm() {
           disabled={loading}
         >
           <Title level={5}>Informations de l&apos;entreprise</Title>
-          <Form.Item
-            label="Code"
-            name="code"
-            rules={[{ required: true, message: "Code requis" }]}
-          >
-            <Input />
-          </Form.Item>
           <Form.Item
             label="Nom"
             name="name"
