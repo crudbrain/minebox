@@ -14,6 +14,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: { email: string; password: string }) => {
+    if (loading) return;
     setLoading(true);
     try {
       const result = await authClient.signIn.email({
@@ -21,7 +22,23 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
         password: values.password,
       });
       if (result.error) {
-        message.error(result.error.message || "Échec de la connexion");
+        const errMsg = (result.error.message || "").toLowerCase();
+        const errCode = (result.error as any).code || "";
+        if (
+          errMsg.includes("invalid email or password") ||
+          errMsg.includes("invalid credentials") ||
+          errCode === "INVALID_EMAIL_OR_PASSWORD"
+        ) {
+          message.error("Email ou mot de passe incorrect");
+        } else if (
+          errMsg.includes("account not found") ||
+          errMsg.includes("user not found") ||
+          errCode === "USER_NOT_FOUND"
+        ) {
+          message.error("Aucun compte trouvé avec cet email");
+        } else {
+          message.error(result.error.message || "Échec de la connexion");
+        }
       } else {
         message.success("Connexion réussie");
         window.location.reload();
