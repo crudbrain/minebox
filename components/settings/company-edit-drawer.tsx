@@ -86,7 +86,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
         autoComplete="off"
       >
         <Form.Item name="code" label="Code">
-          <Input />
+          <Input disabled />
         </Form.Item>
         <Form.Item name="name" label="Nom">
           <Input />

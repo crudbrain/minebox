@@ -8,7 +8,7 @@ const { Title } = Typography;
 
 function getPasswordStrength(password: string) {
   let score = 0;
-  if (password.length >= 6) score++;
+  if (password.length >= 8) score++;
   if (/[A-Z]/.test(password)) score++;
   if (/[a-z]/.test(password)) score++;
   if (/\d/.test(password)) score++;
@@ -43,7 +43,7 @@ function PasswordStrength({ password }: { password: string }) {
         {label}
       </div>
       <div className="text-xs text-gray-500 mt-1">
-        Min. 6 caractères, majuscule, minuscule, chiffre, caractère spécial
+        Min. 8 caractères, majuscule, minuscule, chiffre, caractère spécial
       </div>
     </div>
   );
@@ -235,7 +235,7 @@ export function SetupForm({ code }: { code: string }) {
             name="adminPassword"
             rules={[
               { required: true, message: "Mot de passe requis" },
-              { min: 6, message: "Mot de passe minimum 6 caractères" },
+              { min: 8, message: "Mot de passe minimum 8 caractères" },
             ]}
           >
             <Input.Password
