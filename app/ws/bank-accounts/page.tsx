@@ -12,7 +12,7 @@ export default function BankAccountsPage() {
   return (
     <div>
       <PageHeader
-        title="Comptes bancaires"
+        title="Comptes"
         action={{
           label: "Nouveau compte",
           icon: <PlusOutlined />,

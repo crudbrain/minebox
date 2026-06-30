@@ -24,7 +24,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
         message.error(result.error.message || "Échec de la connexion");
       } else {
         message.success("Connexion réussie");
-        window.location.href = "/ws";
+        window.location.reload();
       }
     } catch {
       message.error("Échec de la connexion");

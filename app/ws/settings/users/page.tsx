@@ -28,6 +28,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/shared/page-header";
 import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/lib/hooks/use-session";
 import { UserCreateDrawer } from "@/components/settings/user-create-drawer";
 import { UserEditDrawer } from "@/components/settings/user-edit-drawer";
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
@@ -51,6 +52,9 @@ export default function UsersPage() {
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const { data: sessionData } = useSession();
+  const currentUserId = sessionData?.user?.id;
+
   const {
     data: usersData,
     isLoading,
@@ -66,8 +70,14 @@ export default function UsersPage() {
   });
 
   const users = usersData?.users || [];
+  const adminCount = users.filter(u => (u.role || "user") === "admin").length;
 
   const handleSetRole = async (userId: string, role: "admin" | "user") => {
+    const targetUser = users.find(u => u.id === userId);
+    if (role === "user" && targetUser && (targetUser.role || "user") === "admin" && adminCount <= 1) {
+      message.error("Impossible de rétrograder le dernier administrateur");
+      return;
+    }
     try {
       await authClient.admin.setRole({
         userId,
@@ -154,6 +164,10 @@ export default function UsersPage() {
   };
 
   const handleRevokeSessions = async (userId: string) => {
+    if (userId === currentUserId) {
+      message.error("Vous ne pouvez pas révoquer vos propres sessions");
+      return;
+    }
     Modal.confirm({
       title: "Révoquer toutes les sessions",
       content: "Cela déconnectera l'utilisateur de tous ses appareils. Continuer ?",
@@ -184,6 +198,19 @@ export default function UsersPage() {
 
   const handleConfirmDelete = async () => {
     if (!deleteUserId) return;
+    const targetUser = users.find(u => u.id === deleteUserId);
+    if (deleteUserId === currentUserId) {
+      message.error("Vous ne pouvez pas supprimer votre propre compte");
+      setDeleteLoading(false);
+      setDeleteUserId(null);
+      return;
+    }
+    if (targetUser && (targetUser.role || "user") === "admin" && adminCount <= 1) {
+      message.error("Impossible de supprimer le dernier administrateur");
+      setDeleteLoading(false);
+      setDeleteUserId(null);
+      return;
+    }
     setDeleteLoading(true);
     try {
       await authClient.admin.removeUser({ userId: deleteUserId });
@@ -265,6 +292,8 @@ export default function UsersPage() {
             key: "role-admin",
             icon: <SafetyCertificateOutlined />,
             label: (record.role || "user") === "admin" ? "Rétrograder en user" : "Promouvoir admin",
+            disabled: (record.role || "user") === "admin" && adminCount <= 1,
+            title: (record.role || "user") === "admin" && adminCount <= 1 ? "Impossible de rétrograder le dernier administrateur" : undefined,
             onClick: () =>
               handleSetRole(record.id, (record.role || "user") === "admin" ? "user" : "admin"),
           },
@@ -297,6 +326,8 @@ export default function UsersPage() {
             key: "revoke",
             icon: <LogoutOutlined />,
             label: "Révoquer sessions",
+            disabled: record.id === currentUserId,
+            title: record.id === currentUserId ? "Vous ne pouvez pas révoquer vos propres sessions" : undefined,
             onClick: () => handleRevokeSessions(record.id),
           },
           {
@@ -311,6 +342,12 @@ export default function UsersPage() {
             icon: <DeleteOutlined />,
             label: "Supprimer",
             danger: true,
+            disabled: record.id === currentUserId || ((record.role || "user") === "admin" && adminCount <= 1),
+            title: record.id === currentUserId
+              ? "Vous ne pouvez pas supprimer votre propre compte"
+              : (record.role || "user") === "admin" && adminCount <= 1
+                ? "Impossible de supprimer le dernier administrateur"
+                : undefined,
             onClick: () => handleDelete(record.id),
           },
         ];

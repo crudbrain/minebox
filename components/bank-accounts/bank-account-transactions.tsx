@@ -41,6 +41,15 @@ export function BankAccountTransactions({
   const printRef = useRef<HTMLDivElement>(null);
   const transactionType = Form.useWatch("type", form);
 
+  useEffect(() => {
+    if (modalOpen && editingTransaction) {
+      form.setFieldsValue({
+        ...editingTransaction,
+        date: dayjs(editingTransaction.date),
+      });
+    }
+  }, [modalOpen, editingTransaction, form]);
+
   const [page, setPage] = useQueryState("page", {
     defaultValue: 1,
     parse: (v) => Math.max(1, Number(v) || 1),
@@ -112,7 +121,7 @@ export function BankAccountTransactions({
       .filter((acc: any) => acc.id !== accountId)
       .map((acc: any) => ({
         value: acc.id,
-        label: `${acc.firstName} ${acc.lastName} (${acc.accountNumber})`,
+        label: [acc.lastName, acc.surname, acc.firstName].filter(Boolean).join(" ") + ` (${acc.accountNumber})`,
       }));
   }, [bankAccountsData, accountId]);
 
@@ -185,22 +194,22 @@ export function BankAccountTransactions({
         render: (_: any, record: any) => {
           if (record.type === "DEPOSIT") {
             const name = record.account
-              ? `${record.account.firstName} ${record.account.lastName}`
+              ? [record.account.lastName, record.account.surname, record.account.firstName].filter(Boolean).join(" ")
               : "?";
             return `Encaissement de ${name}`;
           }
           if (record.type === "WITHDRAWAL") {
             const name = record.account
-              ? `${record.account.firstName} ${record.account.lastName}`
+              ? [record.account.lastName, record.account.surname, record.account.firstName].filter(Boolean).join(" ")
               : "?";
             return `Décaissement de ${name}`;
           }
           if (record.type === "TRANSFER") {
             const from = record.fromAccount
-              ? `${record.fromAccount.firstName} ${record.fromAccount.lastName}`
+              ? [record.fromAccount.lastName, record.fromAccount.surname, record.fromAccount.firstName].filter(Boolean).join(" ")
               : "?";
             const to = record.toAccount
-              ? `${record.toAccount.firstName} ${record.toAccount.lastName}`
+              ? [record.toAccount.lastName, record.toAccount.surname, record.toAccount.firstName].filter(Boolean).join(" ")
               : "?";
             return `Transfert de ${from} à ${to}`;
           }
@@ -265,7 +274,7 @@ export function BankAccountTransactions({
   const printSubtitle = useMemo(() => {
     const parts: string[] = [];
     if (bankAccount) {
-      parts.push(`${bankAccount.firstName} ${bankAccount.lastName} (${bankAccount.accountNumber})`);
+      parts.push([bankAccount.lastName, bankAccount.surname, bankAccount.firstName].filter(Boolean).join(" ") + ` (${bankAccount.accountNumber})`);
     }
     if (dateRange?.[0] && dateRange?.[1]) {
       parts.push(`Période : ${formatDate(dateRange[0].toISOString())} - ${formatDate(dateRange[1].toISOString())}`);
@@ -336,10 +345,6 @@ export function BankAccountTransactions({
         accountId={accountId}
         onEdit={(record) => {
           setEditingTransaction(record);
-          form.setFieldsValue({
-            ...record,
-            date: dayjs(record.date),
-          });
           setDrawerOpen(false);
           setModalOpen(true);
         }}

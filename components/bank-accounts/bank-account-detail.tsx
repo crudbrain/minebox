@@ -60,12 +60,12 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         <Descriptions.Item label="Solde">
           {formatCurrency(bankAccount.balance, company?.currency)}
         </Descriptions.Item>
-        <Descriptions.Item label="Prénom">
-          {bankAccount.firstName}
-        </Descriptions.Item>
         <Descriptions.Item label="Nom">{bankAccount.lastName}</Descriptions.Item>
         <Descriptions.Item label="Surnom">
           {bankAccount.surname || "-"}
+        </Descriptions.Item>
+        <Descriptions.Item label="Prénom">
+          {bankAccount.firstName}
         </Descriptions.Item>
         <Descriptions.Item label="Genre">
           {bankAccount.gender === "M" ? "Masculin" : "Féminin"}
@@ -106,7 +106,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         style={{ borderColor: '#ffccc7', backgroundColor: '#fff2f0', marginTop: 24 }}
         title={<span style={{ color: '#cf1322' }}>Zone danger</span>}
       >
-        <p>Supprimer ce compte bancaire. Cette action est irréversible.</p>
+        <p>Supprimer ce compte. Cette action est irréversible.</p>
         <Button danger icon={<DeleteOutlined />} onClick={() => setDeleteOpen(true)}>
           Supprimer
         </Button>
@@ -122,7 +122,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
-        entityName={`le compte bancaire "${bankAccount.accountNumber}"`}
+        entityName={`le compte "${bankAccount.accountNumber}"`}
         loading={deleteMutation.isPending}
       />
 

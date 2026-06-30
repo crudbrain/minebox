@@ -14,6 +14,7 @@ interface BankAccountRecord {
   accountNumber: string;
   firstName: string;
   lastName: string;
+  surname: string;
   phone: string;
   balance: number;
   blocked: boolean;
@@ -51,7 +52,9 @@ export const BankAccountTable = memo(function BankAccountTable() {
         title: "Nom complet",
         key: "fullName",
         render: (_: unknown, record: BankAccountRecord) =>
-          `${record.firstName} ${record.lastName}`,
+          [record.lastName, record.surname, record.firstName]
+            .filter(Boolean)
+            .join(" "),
       },
       {
         title: "Téléphone",

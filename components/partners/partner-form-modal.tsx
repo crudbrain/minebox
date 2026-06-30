@@ -1,7 +1,6 @@
 'use client';
 
 import { Modal, Form, Input, message } from "antd";
-import { useEffect } from "react";
 import {
   useCreatePartner,
   useUpdatePartner,
@@ -18,12 +17,6 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
   const createMutation = useCreatePartner();
   const updateMutation = useUpdatePartner();
   const isEdit = !!partner;
-
-  useEffect(() => {
-    if (open && isEdit && partner) {
-      form.setFieldsValue(partner);
-    }
-  }, [open, isEdit, partner, form]);
 
   const handleSubmit = (values: any) => {
     if (isEdit) {
@@ -62,7 +55,7 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
       okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
       destroyOnHidden
       modalRender={(dom) => (
-        <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy initialValues={partner} disabled={createMutation.isPending || updateMutation.isPending}>
           {dom}
         </Form>
       )}

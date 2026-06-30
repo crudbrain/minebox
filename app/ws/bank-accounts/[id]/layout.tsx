@@ -41,7 +41,7 @@ export default function BankAccountLayout({
           <span className="text-gray-500 text-sm">{bankAccount.accountNumber}</span>
         </div>
         <h1 className="text-2xl font-semibold mb-1">
-          {bankAccount.firstName} {bankAccount.lastName}
+          {[bankAccount.lastName, bankAccount.surname, bankAccount.firstName].filter(Boolean).join(" ")}
         </h1>
         <p className="text-lg text-gray-700 mb-4">
           {formatCurrency(bankAccount.balance, company?.currency)}

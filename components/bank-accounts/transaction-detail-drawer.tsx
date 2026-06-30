@@ -29,23 +29,23 @@ function getIntitule(transaction: any, forExport: boolean = false): string {
     case "DEPOSIT": {
       if (forExport) return "Encaissement";
       const name = transaction.account
-        ? `${transaction.account.firstName} ${transaction.account.lastName}`
+        ? [transaction.account.lastName, transaction.account.surname, transaction.account.firstName].filter(Boolean).join(" ")
         : "?";
       return `Encaissement de ${name}`;
     }
     case "WITHDRAWAL": {
       if (forExport) return "Décaissement";
       const name = transaction.account
-        ? `${transaction.account.firstName} ${transaction.account.lastName}`
+        ? [transaction.account.lastName, transaction.account.surname, transaction.account.firstName].filter(Boolean).join(" ")
         : "?";
       return `Décaissement de ${name}`;
     }
     case "TRANSFER": {
       const from = transaction.fromAccount
-        ? `${transaction.fromAccount.firstName} ${transaction.fromAccount.lastName}`
+        ? [transaction.fromAccount.lastName, transaction.fromAccount.surname, transaction.fromAccount.firstName].filter(Boolean).join(" ")
         : "?";
       const to = transaction.toAccount
-        ? `${transaction.toAccount.firstName} ${transaction.toAccount.lastName}`
+        ? [transaction.toAccount.lastName, transaction.toAccount.surname, transaction.toAccount.firstName].filter(Boolean).join(" ")
         : "?";
       return `Transfert de ${from} à ${to}`;
     }
@@ -122,10 +122,8 @@ export function TransactionDetailDrawer({
 
     const firstName = transaction.account?.firstName || "";
     const lastName = transaction.account?.lastName || "";
-    const surname = transaction.account?.surname?.toUpperCase() || "";
-    const accountName = `${firstName.toUpperCase()} ${lastName.toUpperCase()} ${surname} (${accountNumber})`
-      .replace(/\s+/g, " ")
-      .trim();
+    const surname = transaction.account?.surname || "";
+    const accountName = [lastName.toUpperCase(), surname.toUpperCase(), firstName.toUpperCase()].filter(Boolean).join(" ") + ` (${accountNumber})`;
 
     const shareText = `*Détails*
 

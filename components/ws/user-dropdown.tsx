@@ -2,17 +2,15 @@
 
 import { Dropdown, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 
-export function UserDropdown() {
+export function UserDropdown({ collapsed }: { collapsed?: boolean }) {
   const { data: session } = useSession();
-  const router = useRouter();
 
   const handleSignOut = async () => {
     await authClient.signOut();
-    router.push("/login");
+    window.location.reload();
   };
 
   const items = [
@@ -36,11 +34,13 @@ export function UserDropdown() {
 
   return (
     <Dropdown menu={{ items }} placement="topRight">
-      <div className="flex items-center gap-3 cursor-pointer">
+      <div className={`flex items-center gap-3 cursor-pointer ${collapsed ? "justify-center" : ""}`}>
         <Avatar icon={<UserOutlined />} />
-        <div className="text-sm truncate">
-          {session?.user?.name || "Utilisateur"}
-        </div>
+        {!collapsed && (
+          <div className="text-sm truncate">
+            {session?.user?.name || "Utilisateur"}
+          </div>
+        )}
       </div>
     </Dropdown>
   );

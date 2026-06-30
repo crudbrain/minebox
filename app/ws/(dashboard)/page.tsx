@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Statistic } from "antd";
+import { Card, Statistic, Divider } from "antd";
 import { BankOutlined, TeamOutlined, DollarOutlined } from "@ant-design/icons";
 import { useDashboardStats } from "@/lib/hooks/use-dashboard";
 import { formatCurrency } from "@/lib/utils";
@@ -14,7 +14,7 @@ export default function DashboardPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-      <Card title="Comptes bancaires" className="mb-6">
+      <Card title="Comptes">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <Statistic
@@ -45,6 +45,8 @@ export default function DashboardPage() {
           </Card>
         </div>
       </Card>
+
+      <Divider />
 
       <Card title="Partenaires">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

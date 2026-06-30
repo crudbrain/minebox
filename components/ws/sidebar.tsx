@@ -1,11 +1,14 @@
 'use client';
 
-import { Layout, Menu, Avatar, Skeleton } from "antd";
+import { useState } from "react";
+import { Layout, Menu, Avatar, Skeleton, Button } from "antd";
 import {
   DashboardOutlined,
   BankOutlined,
   TeamOutlined,
   SettingOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -15,12 +18,23 @@ import { UserDropdown } from "./user-dropdown";
 
 const { Sider } = Layout;
 
+function getActiveKey(pathname: string, keys: string[]): string {
+  let best = "/";
+  for (const key of keys) {
+    if (pathname === key || pathname.startsWith(key + "/")) {
+      if (key.length > best.length) best = key;
+    }
+  }
+  return best;
+}
+
 export function Sidebar({ company: companyProp }: { company?: any }) {
   const { data: companyFromHook, isLoading: hookLoading } = useCompany();
   const company = companyProp ?? companyFromHook;
   const isLoading = companyProp ? false : hookLoading;
   const pathname = usePathname();
   const { data: session } = useSession();
+  const [collapsed, setCollapsed] = useState(false);
 
   const menuItems = [
     {
@@ -49,13 +63,20 @@ export function Sidebar({ company: companyProp }: { company?: any }) {
       : []),
   ];
 
+  const allKeys = menuItems.map((item) => item.key);
+  const activeKey = getActiveKey(pathname, allKeys);
+
   return (
     <Sider
       width={260}
-      className="min-h-screen flex flex-col"
+      collapsed={collapsed}
+      collapsedWidth={80}
+      trigger={null}
+      className="h-screen"
       theme="light"
+      style={{ display: "flex", flexDirection: "column" }}
     >
-      <div className="p-4 flex items-center gap-3 border-b border-gray-200">
+      <div className="p-4 flex items-center gap-3 border-b border-gray-200 shrink-0">
         {isLoading ? (
           <Skeleton active avatar paragraph={{ rows: 1 }} />
         ) : (
@@ -65,23 +86,31 @@ export function Sidebar({ company: companyProp }: { company?: any }) {
             ) : (
               <Avatar size="large">{company?.name?.[0]}</Avatar>
             )}
-            <div className="font-semibold truncate">
-              {company?.shortName || company?.name}
-            </div>
+            {!collapsed && (
+              <div className="font-semibold truncate">
+                {company?.shortName || company?.name}
+              </div>
+            )}
           </>
         )}
+        <Button
+          type="text"
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={() => setCollapsed(!collapsed)}
+          className="ml-auto"
+        />
       </div>
 
-      <div className="flex-1 py-4">
+      <div className="flex-1 py-4 overflow-auto">
         <Menu
           mode="inline"
-          selectedKeys={[pathname]}
+          selectedKeys={[activeKey]}
           items={menuItems}
         />
       </div>
 
-      <div className="p-4 border-t border-gray-200">
-        <UserDropdown />
+      <div className="p-4 border-t border-gray-200 shrink-0">
+        <UserDropdown collapsed={collapsed} />
       </div>
     </Sider>
   );

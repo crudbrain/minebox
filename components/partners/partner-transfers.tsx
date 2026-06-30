@@ -38,6 +38,15 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
   const [isPrinting, setIsPrinting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (modalOpen && editingTransfer) {
+      form.setFieldsValue({
+        ...editingTransfer,
+        date: dayjs(editingTransfer.date),
+      });
+    }
+  }, [modalOpen, editingTransfer, form]);
+
   const [page, setPage] = useQueryState("page", {
     defaultValue: 1,
     parse: (v) => Math.max(1, Number(v) || 1),
@@ -288,10 +297,6 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         }}
         onEdit={(record) => {
           setEditingTransfer(record);
-          form.setFieldsValue({
-            ...record,
-            date: dayjs(record.date),
-          });
           setDrawerOpen(false);
           setModalOpen(true);
         }}

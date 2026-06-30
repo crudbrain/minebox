@@ -1,14 +1,12 @@
 "use client";
 
 import { Form, Input, Select, Button, Card, Typography, message } from "antd";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createCompany } from "@/lib/api/company";
 
 const { Title } = Typography;
 
 export function SetupForm() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
@@ -43,7 +41,7 @@ export function SetupForm() {
         },
       });
       message.success("Configuration réussie");
-      router.push("/login");
+      window.location.reload();
     } catch {
       message.error("Échec de la configuration");
     } finally {
@@ -54,8 +52,15 @@ export function SetupForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-8">
       <Card className="w-full max-w-2xl">
-        <Title level={3} className="text-center">Configuration Minebox</Title>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Title level={3} className="text-center">
+          Configuration
+        </Title>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          disabled={loading}
+        >
           <Title level={5}>Informations de l&apos;entreprise</Title>
           <Form.Item
             label="Code"
@@ -84,7 +89,10 @@ export function SetupForm() {
           >
             <Select
               placeholder="Sélectionner une devise"
-              options={[{ value: "USD", label: "USD" }, { value: "CDF", label: "CDF" }]}
+              options={[
+                { value: "USD", label: "USD" },
+                { value: "CDF", label: "CDF" },
+              ]}
             />
           </Form.Item>
           <Form.Item label="Pays" name="country">
@@ -157,7 +165,7 @@ export function SetupForm() {
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error("Les mots de passe ne correspondent pas")
+                    new Error("Les mots de passe ne correspondent pas"),
                   );
                 },
               }),
@@ -166,7 +174,13 @@ export function SetupForm() {
             <Input.Password />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" loading={loading} block>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            block
+            disabled={loading}
+          >
             Configurer
           </Button>
         </Form>

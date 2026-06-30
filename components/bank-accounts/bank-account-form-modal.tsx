@@ -32,10 +32,7 @@ export function BankAccountFormModal({
     if (open && !isEdit && generatedNumber?.accountNumber) {
       form.setFieldValue("accountNumber", generatedNumber.accountNumber);
     }
-    if (open && isEdit && bankAccount) {
-      form.setFieldsValue(bankAccount);
-    }
-  }, [open, isEdit, bankAccount, generatedNumber, form]);
+  }, [open, isEdit, generatedNumber, form]);
 
   const handleSubmit = (values: any) => {
     if (isEdit) {
@@ -74,7 +71,7 @@ export function BankAccountFormModal({
       okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
       destroyOnHidden
       modalRender={(dom) => (
-        <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy disabled={createMutation.isPending || updateMutation.isPending}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit} clearOnDestroy initialValues={isEdit ? bankAccount : { accountNumber: "" }} disabled={createMutation.isPending || updateMutation.isPending}>
           {dom}
         </Form>
       )}
@@ -83,20 +80,20 @@ export function BankAccountFormModal({
         <Input disabled={isEdit} />
       </Form.Item>
       <Form.Item
-        label="Prénom"
-        name="firstName"
-        rules={[{ required: true, message: "Prénom requis" }]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
         label="Nom"
         name="lastName"
         rules={[{ required: true, message: "Nom requis" }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item label="Surnom" name="surname">
+      <Form.Item label="Surnom" name="surname" rules={[{ required: true, message: "Surnom requis" }]}>
+        <Input />
+      </Form.Item>
+      <Form.Item
+        label="Prénom"
+        name="firstName"
+        rules={[{ required: true, message: "Prénom requis" }]}
+      >
         <Input />
       </Form.Item>
       <Form.Item
