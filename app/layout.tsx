@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Minebox",
-  description: "Gestion de comptes bancaires et partenaires",
+  description: "Gestion de comptes et partenaires",
 };
 
 export default function RootLayout({
