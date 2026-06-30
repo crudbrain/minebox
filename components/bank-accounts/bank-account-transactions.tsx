@@ -316,6 +316,7 @@ export function BankAccountTransactions({
         </div>
       </div>
       <Table
+        size="small"
         columns={columns}
         dataSource={data?.data || []}
         loading={isLoading}
@@ -380,7 +381,7 @@ export function BankAccountTransactions({
           name="date"
           rules={[{ required: true, message: "Date requise" }]}
         >
-          <DatePicker className="w-full" />
+          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
         </Form.Item>
         <Form.Item
           label="Type"

@@ -377,6 +377,7 @@ export default function UsersPage() {
       />
 
       <Table
+        size="small"
         columns={columns}
         dataSource={users}
         rowKey="id"

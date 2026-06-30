@@ -89,6 +89,7 @@ export const PartnerTable = memo(function PartnerTable() {
         />
       </div>
       <Table
+        size="small"
         columns={columns}
         dataSource={data?.data || []}
         loading={isLoading}

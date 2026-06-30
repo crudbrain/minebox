@@ -269,6 +269,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         </div>
       </div>
       <Table
+        size="small"
         columns={columns}
         dataSource={data?.data || []}
         loading={isLoading}
@@ -332,7 +333,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
           name="date"
           rules={[{ required: true, message: "Date requise" }]}
         >
-          <DatePicker className="w-full" />
+          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
         </Form.Item>
         <Form.Item
           label="Type"

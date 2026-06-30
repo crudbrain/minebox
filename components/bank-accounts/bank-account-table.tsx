@@ -118,6 +118,7 @@ export const BankAccountTable = memo(function BankAccountTable() {
         />
       </div>
       <Table
+        size="small"
         columns={columns}
         dataSource={data?.data || []}
         loading={isLoading}
