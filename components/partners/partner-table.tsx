@@ -93,6 +93,7 @@ export const PartnerTable = memo(function PartnerTable() {
         dataSource={data?.data || []}
         loading={isLoading}
         rowKey="id"
+        scroll={{ x: 600 }}
         pagination={{
           current: page,
           pageSize: pageSize,

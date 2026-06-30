@@ -3,6 +3,8 @@
 import { Modal, Form, Input } from "antd";
 import { useEffect } from "react";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface ConfirmDeleteModalProps {
   open: boolean;
   onClose: () => void;
@@ -20,6 +22,7 @@ export function ConfirmDeleteModal({
 }: ConfirmDeleteModalProps) {
   const [form] = Form.useForm();
   const confirmText = Form.useWatch("confirmText", form);
+  const { isMobile } = useBreakpoint();
 
   useEffect(() => {
     if (!open) {
@@ -40,6 +43,7 @@ export function ConfirmDeleteModal({
       onCancel={onClose}
       okText="Supprimer"
       cancelText="Annuler"
+      width={isMobile ? "calc(100vw - 32px)" : undefined}
       okButtonProps={{
         danger: true,
         htmlType: 'submit',

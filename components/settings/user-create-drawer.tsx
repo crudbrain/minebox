@@ -4,6 +4,8 @@ import { Drawer, Form, Input, Select, Button, message } from "antd";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface UserCreateDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -13,6 +15,7 @@ interface UserCreateDrawerProps {
 export function UserCreateDrawer({ open, onClose, onSuccess }: UserCreateDrawerProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { isMobile } = useBreakpoint();
 
   const handleSubmit = async (values: {
     name: string;
@@ -42,7 +45,7 @@ export function UserCreateDrawer({ open, onClose, onSuccess }: UserCreateDrawerP
   return (
     <Drawer
       title="Créer un utilisateur"
-      size={420}
+      width={isMobile ? "100vw" : 420}
       open={open}
       onClose={() => {
         form.resetFields();

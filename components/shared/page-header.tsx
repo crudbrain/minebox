@@ -12,7 +12,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, action }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between mb-6">
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
       <h1 className="text-2xl font-semibold">{title}</h1>
       {action && (
         <Button type="primary" icon={action.icon} onClick={action.onClick}>

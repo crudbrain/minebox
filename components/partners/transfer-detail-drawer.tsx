@@ -10,6 +10,8 @@ import { useReactToPrint } from "react-to-print";
 import { useCompany } from "@/lib/hooks/use-company";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface TransferDetailDrawerProps {
   open: boolean;
   transfer: any | null;
@@ -37,6 +39,7 @@ export function TransferDetailDrawer({
   onDelete,
 }: TransferDetailDrawerProps) {
   const { data: company } = useCompany();
+  const { isMobile } = useBreakpoint();
   const componentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -66,7 +69,7 @@ export function TransferDetailDrawer({
       title="Détails du transfert"
       open={open}
       onClose={onClose}
-      size={480}
+      width={isMobile ? "100vw" : 480}
       extra={
         <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">
           <Button icon={<MoreOutlined />} />

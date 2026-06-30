@@ -37,8 +37,8 @@ export default function PartnerLayout({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold mb-1">Partenaire {partner.code}</h1>
-        <p className="text-lg text-gray-700 mb-4">
+        <h1 className="text-2xl font-semibold mb-1 break-words">Partenaire {partner.code}</h1>
+        <p className="text-lg text-gray-700 mb-4 break-words">
           {formatCurrency(partner.balance, company?.currency)}
         </p>
         <DetailTabsHeader tabs={tabs} />

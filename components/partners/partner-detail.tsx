@@ -10,6 +10,8 @@ import { useDeletePartner } from "@/lib/hooks/use-partners";
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 import { PartnerFormModal } from "./partner-form-modal";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface PartnerDetailProps {
   partner: any;
 }
@@ -18,6 +20,7 @@ export function PartnerDetail({ partner }: PartnerDetailProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const { data: company } = useCompany();
+  const { isMobile } = useBreakpoint();
   const router = useRouter();
   const deleteMutation = useDeletePartner();
 
@@ -34,7 +37,7 @@ export function PartnerDetail({ partner }: PartnerDetailProps) {
           Modifier
         </Button>
       </div>
-      <Descriptions bordered column={2}>
+      <Descriptions bordered column={isMobile ? 1 : 2}>
         <Descriptions.Item label="Code">{partner.code}</Descriptions.Item>
         <Descriptions.Item label="Solde">
           {formatCurrency(partner.balance, company?.currency)}

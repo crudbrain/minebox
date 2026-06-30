@@ -6,6 +6,8 @@ import {
   useUpdatePartner,
 } from "@/lib/hooks/use-partners";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface PartnerFormModalProps {
   open: boolean;
   onClose: () => void;
@@ -17,6 +19,7 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
   const createMutation = useCreatePartner();
   const updateMutation = useUpdatePartner();
   const isEdit = !!partner;
+  const { isMobile } = useBreakpoint();
 
   const handleSubmit = (values: any) => {
     if (isEdit) {
@@ -52,6 +55,7 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
       onCancel={onClose}
       okText={isEdit ? "Enregistrer" : "Créer"}
       cancelText="Annuler"
+      width={isMobile ? "calc(100vw - 32px)" : undefined}
       okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
       destroyOnHidden
       modalRender={(dom) => (

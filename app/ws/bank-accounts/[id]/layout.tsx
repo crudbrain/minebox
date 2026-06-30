@@ -40,10 +40,10 @@ export default function BankAccountLayout({
         <div className="mb-1">
           <span className="text-gray-500 text-sm">{bankAccount.accountNumber}</span>
         </div>
-        <h1 className="text-2xl font-semibold mb-1">
+        <h1 className="text-2xl font-semibold mb-1 break-words">
           {[bankAccount.lastName, bankAccount.surname, bankAccount.firstName].filter(Boolean).join(" ")}
         </h1>
-        <p className="text-lg text-gray-700 mb-4">
+        <p className="text-lg text-gray-700 mb-4 break-words">
           {formatCurrency(bankAccount.balance, company?.currency)}
         </p>
         <DetailTabsHeader tabs={tabs} />

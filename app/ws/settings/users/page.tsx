@@ -33,6 +33,8 @@ import { UserCreateDrawer } from "@/components/settings/user-create-drawer";
 import { UserEditDrawer } from "@/components/settings/user-edit-drawer";
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface User {
   id: string;
   name: string;
@@ -51,6 +53,7 @@ export default function UsersPage() {
   const [sessionsUser, setSessionsUser] = useState<User | null>(null);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const { isMobile } = useBreakpoint();
 
   const { data: sessionData } = useSession();
   const currentUserId = sessionData?.user?.id;
@@ -378,6 +381,7 @@ export default function UsersPage() {
         dataSource={users}
         rowKey="id"
         loading={isLoading}
+        scroll={{ x: 800 }}
         pagination={{ pageSize: 10 }}
       />
 
@@ -407,7 +411,7 @@ export default function UsersPage() {
 
       <Drawer
         title={`Sessions de ${sessionsUser?.name || ""}`}
-        size={480}
+        width={isMobile ? "100vw" : 480}
         open={!!sessionsUser}
         onClose={() => setSessionsUser(null)}
       >

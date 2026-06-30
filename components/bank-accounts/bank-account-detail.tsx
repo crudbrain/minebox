@@ -10,6 +10,8 @@ import { useDeleteBankAccount, useUpdateBankAccount } from "@/lib/hooks/use-bank
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 import { BankAccountFormModal } from "./bank-account-form-modal";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface BankAccountDetailProps {
   bankAccount: any;
 }
@@ -20,6 +22,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingBlocked, setPendingBlocked] = useState<boolean | null>(null);
   const { data: company } = useCompany();
+  const { isMobile } = useBreakpoint();
   const router = useRouter();
   const deleteMutation = useDeleteBankAccount();
   const updateMutation = useUpdateBankAccount();
@@ -53,7 +56,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
           Modifier
         </Button>
       </div>
-      <Descriptions bordered column={2}>
+      <Descriptions bordered column={isMobile ? 1 : 2}>
         <Descriptions.Item label="Numéro de compte">
           {bankAccount.accountNumber}
         </Descriptions.Item>

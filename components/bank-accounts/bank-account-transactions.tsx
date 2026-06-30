@@ -20,6 +20,8 @@ import { TransactionDetailDrawer } from "./transaction-detail-drawer";
 
 const { RangePicker } = DatePicker;
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface BankAccountTransactionsProps {
   accountId: string;
 }
@@ -40,6 +42,7 @@ export function BankAccountTransactions({
   const [isPrinting, setIsPrinting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
   const transactionType = Form.useWatch("type", form);
+  const { isMobile } = useBreakpoint();
 
   useEffect(() => {
     if (modalOpen && editingTransaction) {
@@ -284,7 +287,7 @@ export function BankAccountTransactions({
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <RangePicker
           allowClear
           placeholder={["Date début", "Date fin"]}
@@ -317,6 +320,7 @@ export function BankAccountTransactions({
         dataSource={data?.data || []}
         loading={isLoading}
         rowKey="id"
+        scroll={{ x: 900 }}
         onRow={(record) => ({
           onClick: () => {
             setSelectedTransaction(record);
@@ -362,6 +366,7 @@ export function BankAccountTransactions({
         }}
         okText={editingTransaction ? "Enregistrer" : "Créer"}
         cancelText="Annuler"
+        width={isMobile ? "calc(100vw - 32px)" : undefined}
         okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
         destroyOnHidden
         modalRender={(dom) => (
@@ -383,8 +388,8 @@ export function BankAccountTransactions({
           rules={[{ required: true, message: "Type requis" }]}
         >
           <Select placeholder="Sélectionner" options={[
-            { value: "DEPOSIT", label: "Dépôt" },
-            { value: "WITHDRAWAL", label: "Retrait" },
+            { value: "DEPOSIT", label: "Entrée (Encaissement)" },
+            { value: "WITHDRAWAL", label: "Sortie (Décaissement)" },
             { value: "TRANSFER", label: "Transfert" },
           ]} />
         </Form.Item>

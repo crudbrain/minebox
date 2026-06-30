@@ -13,6 +13,8 @@ import { toJpeg } from "html-to-image";
 import { useCompany } from "@/lib/hooks/use-company";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface TransactionDetailDrawerProps {
   open: boolean;
   transaction: any | null;
@@ -62,6 +64,7 @@ export function TransactionDetailDrawer({
   onDelete,
 }: TransactionDetailDrawerProps) {
   const { data: company } = useCompany();
+  const { isMobile } = useBreakpoint();
   const componentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -151,7 +154,7 @@ Compte: *${accountName}*
       title="Détails de la transaction"
       open={open}
       onClose={onClose}
-      size={480}
+      width={isMobile ? "100vw" : 480}
       extra={
         <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">
           <Button icon={<MoreOutlined />} />

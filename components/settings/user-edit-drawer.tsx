@@ -4,6 +4,8 @@ import { Drawer, Form, Input, Button, message } from "antd";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface User {
   id: string;
   name: string;
@@ -20,6 +22,7 @@ interface UserEditDrawerProps {
 export function UserEditDrawer({ open, onClose, user, onSuccess }: UserEditDrawerProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { isMobile } = useBreakpoint();
 
   useEffect(() => {
     if (open && user) {
@@ -53,7 +56,7 @@ export function UserEditDrawer({ open, onClose, user, onSuccess }: UserEditDrawe
   return (
     <Drawer
       title="Modifier l'utilisateur"
-      size={420}
+      width={isMobile ? "100vw" : 420}
       open={open}
       onClose={() => {
         form.resetFields();

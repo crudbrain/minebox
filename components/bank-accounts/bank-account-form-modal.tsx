@@ -8,6 +8,8 @@ import {
 } from "@/lib/hooks/use-bank-accounts";
 import { useGenerateAccountNumber } from "@/lib/hooks/use-generate-account-number";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface BankAccountFormModalProps {
   open: boolean;
   onClose: () => void;
@@ -23,6 +25,7 @@ export function BankAccountFormModal({
   const createMutation = useCreateBankAccount();
   const updateMutation = useUpdateBankAccount();
   const isEdit = !!bankAccount;
+  const { isMobile } = useBreakpoint();
 
   const { data: generatedNumber } = useGenerateAccountNumber(
     open && !isEdit
@@ -68,6 +71,7 @@ export function BankAccountFormModal({
       onCancel={onClose}
       okText={isEdit ? "Enregistrer" : "Créer"}
       cancelText="Annuler"
+      width={isMobile ? "calc(100vw - 32px)" : undefined}
       okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
       destroyOnHidden
       modalRender={(dom) => (

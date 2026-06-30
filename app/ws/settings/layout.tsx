@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { PageHeader } from "@/components/shared/page-header";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 
 export default async function SettingsLayout({
@@ -16,6 +17,9 @@ export default async function SettingsLayout({
 
   return (
     <div>
+      <PageHeader
+        title="Paramètres"
+      />
       <SettingsTabs />
       <div className="mt-4">{children}</div>
     </div>

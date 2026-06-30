@@ -122,6 +122,7 @@ export const BankAccountTable = memo(function BankAccountTable() {
         dataSource={data?.data || []}
         loading={isLoading}
         rowKey="id"
+        scroll={{ x: 800 }}
         pagination={{
           current: page,
           pageSize: pageSize,

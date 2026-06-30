@@ -20,6 +20,8 @@ import { TransferDetailDrawer } from "./transfer-detail-drawer";
 
 const { RangePicker } = DatePicker;
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface PartnerTransfersProps {
   partnerId: string;
 }
@@ -37,6 +39,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
   const [printData, setPrintData] = useState<any[] | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+  const { isMobile } = useBreakpoint();
 
   useEffect(() => {
     if (modalOpen && editingTransfer) {
@@ -237,7 +240,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
         <RangePicker
           allowClear
           placeholder={["Date début", "Date fin"]}
@@ -270,6 +273,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         dataSource={data?.data || []}
         loading={isLoading}
         rowKey="id"
+        scroll={{ x: 900 }}
         onRow={(record) => ({
           onClick: () => {
             setSelectedTransfer(record);
@@ -314,6 +318,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         }}
         okText={editingTransfer ? "Enregistrer" : "Créer"}
         cancelText="Annuler"
+        width={isMobile ? "calc(100vw - 32px)" : undefined}
         okButtonProps={{ autoFocus: true, htmlType: 'submit', loading: createMutation.isPending || updateMutation.isPending }}
         destroyOnHidden
         modalRender={(dom) => (

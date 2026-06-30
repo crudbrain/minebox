@@ -12,6 +12,8 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CompanyUpdateInput } from "@/lib/schemas/company";
 
+import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+
 interface CompanyEditDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -34,6 +36,7 @@ async function updateCompany(data: CompanyUpdateInput) {
 export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerProps) {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
+  const { isMobile } = useBreakpoint();
 
   const mutation = useMutation({
     mutationFn: updateCompany,
@@ -60,7 +63,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
   return (
     <Drawer
       title="Modifier l'entreprise"
-      size={520}
+      width={isMobile ? "100vw" : 520}
       open={open}
       onClose={onClose}
       footer={
