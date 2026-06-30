@@ -27,7 +27,7 @@ export function WorkspaceShell({ children, company }: WorkspaceShellProps) {
       />
       <Layout>
         {isMobile && (
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3 bg-container border-b border-border-secondary">
             <Button
               type="text"
               icon={<MenuOutlined />}
@@ -39,7 +39,7 @@ export function WorkspaceShell({ children, company }: WorkspaceShellProps) {
             <UserDropdown collapsed />
           </div>
         )}
-        <Content className="p-3 md:p-6 bg-gray-50">
+        <Content className="p-3 md:p-6 bg-layout">
           {children}
         </Content>
       </Layout>

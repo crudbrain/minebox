@@ -50,7 +50,7 @@ export function SetupForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-layout py-8">
       <Card className="w-full max-w-2xl">
         <Title level={3} className="text-center">
           Configuration

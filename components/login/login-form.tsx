@@ -34,7 +34,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-layout">
       <Card className="w-full max-w-md">
         <Title level={3} className="text-center">Minebox</Title>
         <Form layout="vertical" onFinish={onFinish} disabled={loading}>

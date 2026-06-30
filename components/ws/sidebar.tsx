@@ -82,7 +82,7 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
 
   const sidebarContent = (
     <>
-      <div className="p-4 flex items-center gap-3 border-b border-gray-200 shrink-0">
+      <div className="p-4 flex items-center gap-3 border-b border-border-secondary shrink-0">
         {isLoading ? (
           <Skeleton active avatar paragraph={{ rows: 1 }} />
         ) : (
@@ -118,7 +118,7 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
         />
       </div>
 
-      <div className="p-4 border-t border-gray-200 shrink-0">
+      <div className="p-4 border-t border-border-secondary shrink-0">
         <UserDropdown collapsed={collapsed} />
       </div>
     </>
