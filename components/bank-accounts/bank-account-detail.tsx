@@ -8,7 +8,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
 import { useDeleteBankAccount, useUpdateBankAccount } from "@/lib/hooks/use-bank-accounts";
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
-import { BankAccountFormModal } from "./bank-account-form-modal";
+import { BankAccountFormDrawer } from "./bank-account-form-drawer";
 
 import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
 
@@ -115,7 +115,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         </Button>
       </Card>
 
-      <BankAccountFormModal
+      <BankAccountFormDrawer
         open={editOpen}
         onClose={() => setEditOpen(false)}
         bankAccount={bankAccount}

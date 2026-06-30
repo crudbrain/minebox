@@ -43,7 +43,7 @@ export async function GET(
     }
 
     const transactions = await prisma.transaction.findMany({
-      where: { accountId: id, deleted: false },
+      where: { accountId: id },
       orderBy: { date: "asc" },
       include: { operator: true },
     });
@@ -104,9 +104,22 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const bankAccount = await prisma.bankAccount.update({
+
+    const transfersAsFrom = await prisma.transaction.findFirst({
+      where: { fromAccountId: id, type: "TRANSFER", NOT: { toAccountId: id } },
+    });
+    const transfersAsTo = await prisma.transaction.findFirst({
+      where: { toAccountId: id, type: "TRANSFER", NOT: { fromAccountId: id } },
+    });
+    if (transfersAsFrom || transfersAsTo) {
+      return NextResponse.json(
+        { error: "Cannot delete: account has active transfers with other accounts. Delete those transfers first." },
+        { status: 409 }
+      );
+    }
+
+    const bankAccount = await prisma.bankAccount.delete({
       where: { id },
-      data: { blocked: true },
     });
 
     return NextResponse.json(bankAccount);

@@ -1,6 +1,6 @@
 'use client';
 
-import { Table, Button, Modal, Form, Input, Select, DatePicker, message } from "antd";
+import { Table, Button, Modal, Form, Input, InputNumber, Select, DatePicker, message } from "antd";
 import { PlusOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import dayjs from "dayjs";
@@ -30,6 +30,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
   const { data: company } = useCompany();
   const { data: partner } = usePartner(partnerId);
   const [form] = Form.useForm();
+  const transferType = Form.useWatch("type", form);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTransfer, setEditingTransfer] = useState<any>(null);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
@@ -329,31 +330,21 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         )}
       >
         <Form.Item
-          label="Date"
-          name="date"
-          rules={[{ required: true, message: "Date requise" }]}
-        >
-          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
-        </Form.Item>
-        <Form.Item
           label="Type"
           name="type"
           rules={[{ required: true, message: "Type requis" }]}
         >
-          <Select placeholder="Sélectionner" options={[
+          <Select placeholder="Sélectionner" disabled={!!editingTransfer} options={[
             { value: "MONEY_TRANSFER", label: "Transfert d'argent" },
             { value: "GOLD_TRANSFER", label: "Transfert d'or" },
           ]} />
         </Form.Item>
         <Form.Item
-          label="Montant"
-          name="amount"
-          rules={[{ required: true, message: "Montant requis" }]}
+          label="Date"
+          name="date"
+          rules={[{ required: true, message: "Date requise" }]}
         >
-          <Input type="number" />
-        </Form.Item>
-        <Form.Item label="Quantité d'or" name="goldQuantity">
-          <Input />
+          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
         </Form.Item>
         <Form.Item
           label="Expéditeur"
@@ -362,6 +353,18 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         >
           <Input />
         </Form.Item>
+        <Form.Item
+          label="Montant"
+          name="amount"
+          rules={[{ required: true, message: "Montant requis" }]}
+        >
+          <InputNumber min={0.01} step={0.01} className="w-full" />
+        </Form.Item>
+        {transferType === "GOLD_TRANSFER" && (
+          <Form.Item label="Quantité d'or" name="goldQuantity">
+            <InputNumber min={0.01} step={0.01} className="w-full" />
+          </Form.Item>
+        )}
         <Form.Item label="Message" name="message">
           <Input.TextArea />
         </Form.Item>

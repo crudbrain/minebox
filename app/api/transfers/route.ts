@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     const { partnerId, amount, type } = parsed.data;
 
     const partner = await prisma.partner.findUnique({
-      where: { id: partnerId, deleted: false },
+      where: { id: partnerId },
     });
     if (!partner) {
       return NextResponse.json(

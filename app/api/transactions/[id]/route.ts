@@ -29,7 +29,7 @@ export async function PUT(
     }
 
     const existing = await prisma.transaction.findUnique({
-      where: { id, deleted: false },
+      where: { id },
       include: { account: true },
     });
     if (!existing) {
@@ -50,17 +50,46 @@ export async function PUT(
         data,
       });
 
-      if (parsed.data.amount !== undefined || parsed.data.type !== undefined) {
-        let balanceAdjustment = 0;
-        const oldType = existing.type;
+      if (parsed.data.amount !== undefined && existing.type === "TRANSFER") {
         const oldAmount = existing.amount;
-        const newType = parsed.data.type || oldType;
-        const newAmount = parsed.data.amount !== undefined ? parsed.data.amount : oldAmount;
+        const newAmount = parsed.data.amount;
 
-        if (oldType === "DEPOSIT") balanceAdjustment -= oldAmount;
+        if (oldAmount !== newAmount) {
+          // Find the paired transaction via transferGroupId
+          const paired = await tx.transaction.findFirst({
+            where: { transferGroupId: existing.transferGroupId, id: { not: id } },
+          });
+
+          // Adjust fromAccount balance: less debit if amount decreased
+          await tx.bankAccount.update({
+            where: { id: existing.fromAccountId! },
+            data: { balance: { increment: oldAmount - newAmount } },
+          });
+
+          // Adjust toAccount balance: less credit if amount decreased
+          await tx.bankAccount.update({
+            where: { id: existing.toAccountId! },
+            data: { balance: { increment: newAmount - oldAmount } },
+          });
+
+          // Also update the paired transaction's amount to keep them in sync
+          if (paired) {
+            await tx.transaction.update({
+              where: { id: paired.id },
+              data: { amount: newAmount },
+            });
+          }
+        }
+      } else if (parsed.data.amount !== undefined) {
+        // Non-TRANSFER: simple balance adjustment on the single account
+        let balanceAdjustment = 0;
+        const oldAmount = existing.amount;
+        const newAmount = parsed.data.amount;
+
+        if (existing.type === "DEPOSIT") balanceAdjustment -= oldAmount;
         else balanceAdjustment += oldAmount;
 
-        if (newType === "DEPOSIT") balanceAdjustment += newAmount;
+        if (existing.type === "DEPOSIT") balanceAdjustment += newAmount;
         else balanceAdjustment -= newAmount;
 
         await tx.bankAccount.update({
@@ -93,7 +122,7 @@ export async function DELETE(
 
     const { id } = await params;
     const existing = await prisma.transaction.findUnique({
-      where: { id, deleted: false },
+      where: { id },
       include: { account: true },
     });
     if (!existing) {
@@ -107,7 +136,7 @@ export async function DELETE(
     const pairedIds: string[] = [];
     if (existing.transferGroupId) {
       const paired = await prisma.transaction.findMany({
-        where: { transferGroupId: existing.transferGroupId, deleted: false },
+        where: { transferGroupId: existing.transferGroupId },
       });
       pairedIds.push(...paired.map((t) => t.id));
     }
@@ -119,7 +148,7 @@ export async function DELETE(
           where: { id: txId },
           include: { account: true },
         });
-        if (!txRecord || txRecord.deleted) continue;
+        if (!txRecord) continue;
 
         let balanceAdjustment = 0;
         if (txRecord.type === "DEPOSIT") balanceAdjustment -= txRecord.amount;
@@ -129,9 +158,8 @@ export async function DELETE(
           else if (txRecord.accountId === txRecord.toAccountId) balanceAdjustment -= txRecord.amount;
         }
 
-        await tx.transaction.update({
+        await tx.transaction.delete({
           where: { id: txId },
-          data: { deleted: true },
         });
         await tx.bankAccount.update({
           where: { id: txRecord.accountId },

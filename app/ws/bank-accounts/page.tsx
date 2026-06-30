@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/shared/page-header";
 import { BankAccountTable } from "@/components/bank-accounts/bank-account-table";
-import { BankAccountFormModal } from "@/components/bank-accounts/bank-account-form-modal";
+import { BankAccountFormDrawer } from "@/components/bank-accounts/bank-account-form-drawer";
 import { PlusOutlined } from "@ant-design/icons";
 
 export default function BankAccountsPage() {
@@ -20,7 +20,7 @@ export default function BankAccountsPage() {
         }}
       />
       <BankAccountTable />
-      <BankAccountFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <BankAccountFormDrawer open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }

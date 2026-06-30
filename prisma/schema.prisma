@@ -164,16 +164,15 @@ model Transaction {
   title           String?         @default("")
   message         String          @default("")
   type            TransactionType
-  account         BankAccount     @relation("transaction_account", fields: [accountId], references: [id])
+  account         BankAccount     @relation("transaction_account", fields: [accountId], references: [id], onDelete: Cascade)
   accountId       String          @map("account_id")
-  fromAccount     BankAccount?    @relation("transaction_from", fields: [fromAccountId], references: [id])
+  fromAccount     BankAccount?    @relation("transaction_from", fields: [fromAccountId], references: [id], onDelete: Cascade)
   fromAccountId   String?         @map("from_account_id")
-  toAccount       BankAccount?    @relation("transaction_to", fields: [toAccountId], references: [id])
+  toAccount       BankAccount?    @relation("transaction_to", fields: [toAccountId], references: [id], onDelete: Cascade)
   toAccountId     String?         @map("to_account_id")
   transferGroupId String?         @map("transfer_group_id")
   operator        User            @relation("transaction_operator", fields: [operatorId], references: [id])
   operatorId      String          @map("operator_id")
-  deleted         Boolean         @default(false)
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
 
@@ -185,7 +184,6 @@ model Partner {
   code      String     @unique
   balance   Float
   transfers Transfer[]
-  deleted   Boolean    @default(false)
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
 
@@ -200,7 +198,7 @@ model Transfer {
   goldQuantity String?      @default("")
   sender       String
   message      String       @default("")
-  partner      Partner      @relation(fields: [partnerId], references: [id])
+  partner      Partner      @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   partnerId    String
   operator     User         @relation("transfer_operator", fields: [operatorId], references: [id])
   operatorId   String

@@ -33,11 +33,9 @@ export async function GET(request: NextRequest) {
         _sum: { balance: true },
       }),
       prisma.partner.aggregate({
-        where: { deleted: false },
         _count: true,
       }),
       prisma.partner.aggregate({
-        where: { deleted: false },
         _sum: { balance: true },
       }),
     ]);

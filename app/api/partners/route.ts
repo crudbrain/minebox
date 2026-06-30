@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || undefined;
     const code = searchParams.get("code") || undefined;
 
-    const where: any = { deleted: false };
+    const where: any = {};
     if (search) {
       where.OR = [
         { code: { contains: search, mode: "insensitive" } },

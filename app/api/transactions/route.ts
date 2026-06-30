@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get("dateFrom") || undefined;
     const dateTo = searchParams.get("dateTo") || undefined;
 
-    const where: any = { deleted: false };
+    const where: any = {};
     if (accountId) where.accountId = accountId;
     if (type) where.type = type;
     if (dateFrom || dateTo) {

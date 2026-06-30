@@ -50,17 +50,15 @@ export async function PUT(
         data,
       });
 
-      if (parsed.data.amount !== undefined || parsed.data.type !== undefined) {
+      if (parsed.data.amount !== undefined) {
         let balanceAdjustment = 0;
-        const oldType = existing.type;
         const oldAmount = existing.amount;
-        const newType = parsed.data.type || oldType;
-        const newAmount = parsed.data.amount !== undefined ? parsed.data.amount : oldAmount;
+        const newAmount = parsed.data.amount;
 
-        if (oldType === "GOLD_TRANSFER") balanceAdjustment -= oldAmount;
+        if (existing.type === "GOLD_TRANSFER") balanceAdjustment -= oldAmount;
         else balanceAdjustment += oldAmount;
 
-        if (newType === "GOLD_TRANSFER") balanceAdjustment += newAmount;
+        if (existing.type === "GOLD_TRANSFER") balanceAdjustment += newAmount;
         else balanceAdjustment -= newAmount;
 
         await tx.partner.update({

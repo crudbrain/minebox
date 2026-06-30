@@ -22,7 +22,13 @@ export const transactionCreateSchema = transactionBaseSchema.refine(
   { message: "fromAccountId et toAccountId sont requis et doivent être différents pour un TRANSFER" }
 );
 
-export const transactionUpdateSchema = transactionBaseSchema.partial();
+export const transactionUpdateSchema = z.object({
+  date: z.string().datetime().or(z.date()).optional(),
+  amount: z.number().positive("Le montant doit être positif").optional(),
+  goldQuantity: z.string().optional(),
+  title: z.string().optional(),
+  message: z.string().optional(),
+});
 
 export type TransactionCreateInput = z.infer<typeof transactionCreateSchema>;
 export type TransactionUpdateInput = z.infer<typeof transactionUpdateSchema>;

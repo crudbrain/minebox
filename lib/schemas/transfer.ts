@@ -10,8 +10,12 @@ export const transferCreateSchema = z.object({
   partnerId: z.string().min(1, "Partenaire requis"),
 });
 
-export const transferUpdateSchema = transferCreateSchema.partial().extend({
-  partnerId: z.string().optional(),
+export const transferUpdateSchema = z.object({
+  date: z.string().datetime().or(z.date()).optional(),
+  amount: z.number().positive("Le montant doit être positif").optional(),
+  goldQuantity: z.string().optional(),
+  sender: z.string().optional(),
+  message: z.string().optional(),
 });
 
 export type TransferCreateInput = z.infer<typeof transferCreateSchema>;

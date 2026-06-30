@@ -29,7 +29,7 @@ export async function GET(
 
     const { id } = await params;
     const partner = await prisma.partner.findUnique({
-      where: { id, deleted: false },
+      where: { id },
     });
 
     if (!partner) {
@@ -101,9 +101,8 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const partner = await prisma.partner.update({
+    const partner = await prisma.partner.delete({
       where: { id },
-      data: { deleted: true },
     });
 
     return NextResponse.json(partner);

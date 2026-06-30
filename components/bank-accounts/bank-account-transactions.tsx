@@ -1,6 +1,6 @@
 'use client';
 
-import { Table, Button, Modal, Form, Input, Select, DatePicker, message } from "antd";
+import { Table, Button, Modal, Form, Input, InputNumber, Select, DatePicker, message } from "antd";
 import { PlusOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import dayjs from "dayjs";
@@ -377,38 +377,35 @@ export function BankAccountTransactions({
         )}
       >
         <Form.Item
-          label="Date"
-          name="date"
-          rules={[{ required: true, message: "Date requise" }]}
-        >
-          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
-        </Form.Item>
-        <Form.Item
           label="Type"
           name="type"
           rules={[{ required: true, message: "Type requis" }]}
         >
-          <Select placeholder="Sélectionner" options={[
+          <Select placeholder="Sélectionner" disabled={!!editingTransaction} options={[
             { value: "DEPOSIT", label: "Entrée (Encaissement)" },
             { value: "WITHDRAWAL", label: "Sortie (Décaissement)" },
             { value: "TRANSFER", label: "Transfert" },
           ]} />
         </Form.Item>
         <Form.Item
-          label="Montant"
-          name="amount"
-          rules={[{ required: true, message: "Montant requis" }]}
+          label="Date"
+          name="date"
+          rules={[{ required: true, message: "Date requise" }]}
         >
-          <Input type="number" />
-        </Form.Item>
-        <Form.Item label="Quantité d'or" name="goldQuantity">
-          <Input />
+          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
         </Form.Item>
         <Form.Item label="Titre" name="title">
           <Input />
         </Form.Item>
-        <Form.Item label="Message" name="message">
-          <Input.TextArea />
+        <Form.Item
+          label="Montant"
+          name="amount"
+          rules={[{ required: true, message: "Montant requis" }]}
+        >
+          <InputNumber min={0.01} step={0.01} className="w-full" />
+        </Form.Item>
+        <Form.Item label="Quantité d'or" name="goldQuantity">
+          <InputNumber min={0.01} step={0.01} className="w-full" />
         </Form.Item>
 
         {transactionType === "TRANSFER" && (
@@ -426,7 +423,17 @@ export function BankAccountTransactions({
             <Form.Item
               label="Compte destination"
               name="toAccountId"
-              rules={[{ required: true, message: "Compte destination requis" }]}
+              rules={[
+                { required: true, message: "Compte destination requis" },
+                {
+                  validator: (_, value) => {
+                    if (value && value === accountId) {
+                      return Promise.reject(new Error("Le compte destination doit être différent du compte source"));
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
             >
               <Select
                 placeholder="Sélectionner un compte"
@@ -435,6 +442,10 @@ export function BankAccountTransactions({
             </Form.Item>
           </>
         )}
+
+        <Form.Item label="Message" name="message">
+          <Input.TextArea />
+        </Form.Item>
       </Modal>
 
       <ConfirmDeleteModal
