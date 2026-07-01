@@ -178,6 +178,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         title: "Expéditeur",
         dataIndex: "sender",
         key: "sender",
+        render: (v: string) => v || "-",
       },
       {
         title: "Entrée",
@@ -353,13 +354,15 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         >
           <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm:ss" />
         </Form.Item>
-        <Form.Item
-          label="Expéditeur"
-          name="sender"
-          rules={[{ required: true, message: "Expéditeur requis" }]}
-        >
-          <Input />
-        </Form.Item>
+        {transferType !== "GOLD_TRANSFER" && (
+          <Form.Item
+            label="Expéditeur"
+            name="sender"
+            rules={[{ required: true, message: "Expéditeur requis" }]}
+          >
+            <Input />
+          </Form.Item>
+        )}
         <Form.Item
           label="Montant"
           name="amount"

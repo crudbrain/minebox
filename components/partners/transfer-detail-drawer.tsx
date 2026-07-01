@@ -109,9 +109,11 @@ export function TransferDetailDrawer({
             <Descriptions.Item label="Type d'opération">
               {getTypeLabel(transfer.type)}
             </Descriptions.Item>
-            <Descriptions.Item label="Expéditeur">
-              {transfer.sender}
-            </Descriptions.Item>
+            {transfer.type !== "GOLD_TRANSFER" && (
+              <Descriptions.Item label="Expéditeur">
+                {transfer.sender || "-"}
+              </Descriptions.Item>
+            )}
             <Descriptions.Item label="Montant">
               {formatCurrency(transfer.amount, company?.currency)}
             </Descriptions.Item>
