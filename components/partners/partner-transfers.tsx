@@ -208,7 +208,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         key: "type",
         render: (_: any, record: any) =>
           record.type === "GOLD_TRANSFER"
-            ? "Transfert d'or"
+            ? "Expédition de l'or"
             : record.type === "MONEY_TRANSFER"
             ? "Transfert d'argent"
             : record.type,

@@ -226,13 +226,21 @@ export function BankAccountTransactions({
         align: "right",
         render: (_: any, record: any) => {
           if (record.type === "DEPOSIT") {
-            return formatCurrency(record.amount, company?.currency);
+            return (
+              <Typography.Text type="secondary">
+                {formatCurrency(record.amount, company?.currency)}
+              </Typography.Text>
+            );
           }
           if (
             record.type === "TRANSFER" &&
             record.accountId === record.toAccountId
           ) {
-            return formatCurrency(record.amount, company?.currency);
+            return (
+              <Typography.Text type="secondary">
+                {formatCurrency(record.amount, company?.currency)}
+              </Typography.Text>
+            );
           }
           return "-";
         },
@@ -243,13 +251,13 @@ export function BankAccountTransactions({
         align: "right",
         render: (_: any, record: any) => {
           if (record.type === "WITHDRAWAL") {
-            return formatCurrency(record.amount, company?.currency);
+            return <Typography.Text type="warning">{formatCurrency(record.amount, company?.currency)}</Typography.Text>;
           }
           if (
             record.type === "TRANSFER" &&
             record.accountId !== record.toAccountId
           ) {
-            return formatCurrency(record.amount, company?.currency);
+            return <Typography.Text type="warning">{formatCurrency(record.amount, company?.currency)}</Typography.Text>;
           }
           return "-";
         },
