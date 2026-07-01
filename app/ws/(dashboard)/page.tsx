@@ -15,9 +15,7 @@ interface StatTileProps {
 function StatTile({ icon, label, value }: StatTileProps) {
   return (
     <div className="bg-bg-elevated border border-border-secondary rounded-md p-4 hover:border-primary transition-colors">
-      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-        <span className="text-primary text-lg">{icon}</span>
-      </div>
+      <span className="text-primary text-base block mb-3">{icon}</span>
       <div className="text-2xl font-semibold text-foreground">{value}</div>
       <div className="text-sm text-foreground/60">{label}</div>
     </div>
