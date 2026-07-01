@@ -22,9 +22,14 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
   const { isMobile } = useBreakpoint();
 
   const handleSubmit = (values: any) => {
+    const data = {
+      ...values,
+      balance: Number(values.balance),
+    };
+
     if (isEdit) {
       updateMutation.mutate(
-        { id: partner.id, data: values },
+        { id: partner.id, data },
         {
           onSuccess: () => {
             message.success("Partenaire mis à jour");
@@ -36,7 +41,7 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
         }
       );
     } else {
-      createMutation.mutate(values, {
+      createMutation.mutate(data, {
         onSuccess: () => {
           message.success("Partenaire créé");
           onClose();

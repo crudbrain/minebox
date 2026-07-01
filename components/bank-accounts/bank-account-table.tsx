@@ -8,6 +8,7 @@ import { useBankAccounts } from "@/lib/hooks/use-bank-accounts";
 import { formatCurrency } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
 import { memo, useMemo, useCallback } from "react";
+import type { ColumnsType } from "antd/es/table";
 
 interface BankAccountRecord {
   id: string;
@@ -41,7 +42,7 @@ export const BankAccountTable = memo(function BankAccountTable() {
     search: search || undefined,
   });
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnsType<BankAccountRecord>>(
     () => [
       {
         title: "Numéro de compte",
@@ -65,6 +66,7 @@ export const BankAccountTable = memo(function BankAccountTable() {
         title: "Solde",
         dataIndex: "balance",
         key: "balance",
+        align: "right",
         render: (balance: number) => formatCurrency(balance, company?.currency),
       },
       {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal, Form, Input } from "antd";
+import { Modal, Form, Input, Alert } from "antd";
 import { useEffect } from "react";
 
 import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
@@ -11,6 +11,7 @@ interface ConfirmDeleteModalProps {
   onConfirm: () => Promise<void> | void;
   entityName: string;
   loading?: boolean;
+  warningMessage?: string;
 }
 
 export function ConfirmDeleteModal({
@@ -19,6 +20,7 @@ export function ConfirmDeleteModal({
   onConfirm,
   entityName,
   loading = false,
+  warningMessage,
 }: ConfirmDeleteModalProps) {
   const [form] = Form.useForm();
   const confirmText = Form.useWatch("confirmText", form);
@@ -58,6 +60,7 @@ export function ConfirmDeleteModal({
       )}
     >
       <div className="flex flex-col gap-4">
+        {warningMessage && <Alert type="warning" showIcon message={warningMessage} />}
         <p>Voulez-vous vraiment supprimer {entityName} ? Cette action est irr&eacute;versible.</p>
         <Form.Item
           name="confirmText"

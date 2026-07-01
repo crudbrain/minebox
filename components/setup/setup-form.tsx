@@ -133,9 +133,9 @@ export function SetupForm({ code }: { code: string }) {
         >
           <Divider titlePlacement="left">Informations de l&apos;entreprise</Divider>
           <Form.Item
-            label="Nom"
+            label="Nom de l'entreprise"
             name="name"
-            rules={[{ required: true, message: "Nom requis" }]}
+            rules={[{ required: true, message: "Nom de l'entreprise requis" }]}
           >
             <Input />
           </Form.Item>

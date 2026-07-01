@@ -21,6 +21,7 @@ import { TransferDetailDrawer } from "./transfer-detail-drawer";
 const { RangePicker } = DatePicker;
 
 import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+import type { ColumnsType } from "antd/es/table";
 
 interface PartnerTransfersProps {
   partnerId: string;
@@ -165,7 +166,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
     [deleteMutation]
   );
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnsType<any>>(
     () => [
       {
         title: "Date",
@@ -181,6 +182,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
       {
         title: "Entrée",
         key: "entry",
+        align: "right",
         render: (_: any, record: any) =>
           record.type === "GOLD_TRANSFER"
             ? formatCurrency(record.amount, company?.currency)
@@ -189,6 +191,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
       {
         title: "Sortie",
         key: "exit",
+        align: "right",
         render: (_: any, record: any) =>
           record.type === "MONEY_TRANSFER"
             ? formatCurrency(record.amount, company?.currency)
@@ -214,6 +217,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         title: "Solde",
         dataIndex: "balanceAfter",
         key: "balanceAfter",
+        align: "right",
         render: (balanceAfter: number) =>
           formatCurrency(balanceAfter, company?.currency),
       },
@@ -358,7 +362,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
           name="amount"
           rules={[{ required: true, message: "Montant requis" }]}
         >
-          <InputNumber min={0.01} step={0.01} className="w-full" />
+          <InputNumber min={0.01} step={0.01} className="w-full" addonAfter={company?.currency} />
         </Form.Item>
         {transferType === "GOLD_TRANSFER" && (
           <Form.Item label="Quantité d'or" name="goldQuantity">

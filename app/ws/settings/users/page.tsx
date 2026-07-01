@@ -415,6 +415,7 @@ export default function UsersPage() {
         size={isMobile ? "100vw" : 480}
         open={!!sessionsUser}
         onClose={() => setSessionsUser(null)}
+        closable={{placement:"end"}}
       >
         <UserSessions userId={sessionsUser?.id} />
       </Drawer>

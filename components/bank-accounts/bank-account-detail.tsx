@@ -64,7 +64,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
           {formatCurrency(bankAccount.balance, company?.currency)}
         </Descriptions.Item>
         <Descriptions.Item label="Nom">{bankAccount.lastName}</Descriptions.Item>
-        <Descriptions.Item label="Surnom">
+        <Descriptions.Item label="Postnom">
           {bankAccount.surname || "-"}
         </Descriptions.Item>
         <Descriptions.Item label="Prénom">
@@ -127,6 +127,7 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         onConfirm={handleDelete}
         entityName={`le compte "${bankAccount.accountNumber}"`}
         loading={deleteMutation.isPending}
+        warningMessage="Le compte sera définitivement supprimé, y compris ses mouvements et opérations associées. Cette action est irréversible et ne peut pas être annulée une fois effectuée."
       />
 
       <Modal

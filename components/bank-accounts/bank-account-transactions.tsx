@@ -21,6 +21,7 @@ import { TransactionDetailDrawer } from "./transaction-detail-drawer";
 const { RangePicker } = DatePicker;
 
 import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+import type { ColumnsType } from "antd/es/table";
 
 interface BankAccountTransactionsProps {
   accountId: string;
@@ -183,7 +184,7 @@ export function BankAccountTransactions({
     [deleteMutation]
   );
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnsType<any>>(
     () => [
       {
         title: "Date",
@@ -222,6 +223,7 @@ export function BankAccountTransactions({
       {
         title: "Entrée",
         key: "entry",
+        align: "right",
         render: (_: any, record: any) => {
           if (record.type === "DEPOSIT") {
             return formatCurrency(record.amount, company?.currency);
@@ -238,6 +240,7 @@ export function BankAccountTransactions({
       {
         title: "Sortie",
         key: "exit",
+        align: "right",
         render: (_: any, record: any) => {
           if (record.type === "WITHDRAWAL") {
             return formatCurrency(record.amount, company?.currency);
@@ -255,6 +258,7 @@ export function BankAccountTransactions({
         title: "Solde",
         dataIndex: "balanceAfter",
         key: "balanceAfter",
+        align: "right",
         render: (balanceAfter: number) =>
           formatCurrency(balanceAfter, company?.currency),
       },
@@ -402,7 +406,7 @@ export function BankAccountTransactions({
           name="amount"
           rules={[{ required: true, message: "Montant requis" }]}
         >
-          <InputNumber min={0.01} step={0.01} className="w-full" />
+          <InputNumber min={0.01} step={0.01} className="w-full" addonAfter={company?.currency} />
         </Form.Item>
         <Form.Item label="Quantité d'or" name="goldQuantity">
           <InputNumber min={0.01} step={0.01} className="w-full" />

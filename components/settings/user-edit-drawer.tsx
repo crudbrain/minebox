@@ -62,6 +62,7 @@ export function UserEditDrawer({ open, onClose, user, onSuccess }: UserEditDrawe
         form.resetFields();
         onClose();
       }}
+      closable={{placement:"end"}}
       footer={
         <div className="flex justify-end gap-2">
           <Button onClick={onClose}>Annuler</Button>

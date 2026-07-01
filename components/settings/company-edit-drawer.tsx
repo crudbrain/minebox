@@ -66,6 +66,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
       size={isMobile ? "100vw" : 520}
       open={open}
       onClose={onClose}
+      closable={{placement:"end"}}
       footer={
         <div className="flex justify-end gap-2">
           <Button onClick={onClose}>Annuler</Button>
@@ -88,7 +89,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
         <Form.Item name="code" label="Code">
           <Input disabled />
         </Form.Item>
-        <Form.Item name="name" label="Nom">
+        <Form.Item name="name" label="Nom de l'entreprise">
           <Input />
         </Form.Item>
         <Form.Item name="shortName" label="Nom court">

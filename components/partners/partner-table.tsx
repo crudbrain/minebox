@@ -8,6 +8,7 @@ import { usePartners } from "@/lib/hooks/use-partners";
 import { formatCurrency } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
 import { memo, useMemo, useCallback } from "react";
+import type { ColumnsType } from "antd/es/table";
 
 interface PartnerRecord {
   id: string;
@@ -36,7 +37,7 @@ export const PartnerTable = memo(function PartnerTable() {
     search: search || undefined,
   });
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnsType<PartnerRecord>>(
     () => [
       {
         title: "Code",
@@ -47,6 +48,7 @@ export const PartnerTable = memo(function PartnerTable() {
         title: "Solde",
         dataIndex: "balance",
         key: "balance",
+        align: "right",
         render: (balance: number) => formatCurrency(balance, company?.currency),
       },
     ],

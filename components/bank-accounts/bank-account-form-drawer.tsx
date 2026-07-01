@@ -41,6 +41,12 @@ export function BankAccountFormDrawer({
   );
 
   useEffect(() => {
+    if (open && !isEdit) {
+      form.resetFields();
+    }
+  }, [open, isEdit, form]);
+
+  useEffect(() => {
     if (open && !isEdit && generatedNumber?.accountNumber) {
       form.setFieldValue("accountNumber", generatedNumber.accountNumber);
     }
@@ -87,6 +93,7 @@ export function BankAccountFormDrawer({
       size={isMobile ? "100vw" : 520}
       open={open}
       onClose={onClose}
+      closable={{placement:"end"}}
       destroyOnClose
       footer={
         <div className="flex justify-end gap-2">
@@ -120,7 +127,7 @@ export function BankAccountFormDrawer({
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Surnom" name="surname" rules={[{ required: true, message: "Surnom requis" }]}>
+          <Form.Item label="Postnom" name="surname" rules={[{ required: true, message: "Postnom requis" }]}>
             <Input />
           </Form.Item>
           <Form.Item

@@ -72,6 +72,7 @@ export function PartnerDetail({ partner }: PartnerDetailProps) {
         onConfirm={handleDelete}
         entityName={`le partenaire "${partner.code}"`}
         loading={deleteMutation.isPending}
+        warningMessage="Le partenaire sera définitivement supprimé, y compris ses mouvements et opérations associées. Cette action est irréversible et ne peut pas être annulée une fois effectuée."
       />
     </div>
   );

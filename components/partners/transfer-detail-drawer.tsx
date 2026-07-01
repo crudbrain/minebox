@@ -69,6 +69,7 @@ export function TransferDetailDrawer({
       title="Détails du transfert"
       open={open}
       onClose={onClose}
+      closable={{placement:"end"}}
       size={isMobile ? "100vw" : 480}
       extra={
         <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">

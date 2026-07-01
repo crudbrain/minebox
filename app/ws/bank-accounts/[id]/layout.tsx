@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useMemo } from "react";
-import { Skeleton } from "antd";
+import { Skeleton, Tag } from "antd";
 import { useBankAccount } from "@/lib/hooks/use-bank-accounts";
 import { useCompany } from "@/lib/hooks/use-company";
 import { formatCurrency } from "@/lib/utils";
@@ -38,10 +38,12 @@ export default function BankAccountLayout({
     <div>
       <div className="mb-6">
         <div className="mb-1">
-          <span className="text-gray-500 text-sm">{bankAccount.accountNumber}</span>
+          Compte: <Tag>{bankAccount.accountNumber}</Tag>
         </div>
         <h1 className="text-2xl font-semibold mb-1 break-words">
-          {[bankAccount.lastName, bankAccount.surname, bankAccount.firstName].filter(Boolean).join(" ")}
+          {[bankAccount.lastName, bankAccount.surname, bankAccount.firstName]
+            .filter(Boolean)
+            .join(" ")}
         </h1>
         <p className="text-lg text-gray-700 mb-4 break-words">
           {formatCurrency(bankAccount.balance, company?.currency)}

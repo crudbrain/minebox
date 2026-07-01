@@ -137,7 +137,7 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
         open={mobileOpen}
         onClose={onMobileClose}
         size={280}
-        closable={false}
+        closable={{placement:"end"}}
         styles={{ body: { padding: 0 } }}
       >
         <div className="flex flex-col h-full">
