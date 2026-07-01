@@ -117,9 +117,9 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
               {!collapsed && (
                 <>
                   {company?.logo ? (
-                    <Avatar src={company.logo} size="large" />
+                    <Avatar src={company.logo} size="large" shape="square" />
                   ) : (
-                    <Avatar size="large">{company?.name?.[0]}</Avatar>
+                    <Avatar size="large" shape="square">{company?.name?.[0]}</Avatar>
                   )}
                   <div className="font-semibold truncate">
                     {company?.shortName || company?.name}

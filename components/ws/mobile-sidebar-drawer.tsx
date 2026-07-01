@@ -29,20 +29,20 @@ export function MobileSidebarDrawer({
       placement="left"
       open={open}
       onClose={onClose}
-      width={280}
+      size={280}
       closable={{ placement: "end" }}
       styles={{ body: { padding: 0 } }}
       title={
-        <>
+        <div className="flex items-center gap-2">
           {company?.logo ? (
-            <Avatar src={company.logo} size="large" />
+            <Avatar src={company.logo} size="large" shape="square" />
           ) : (
-            <Avatar size="large">{company?.name?.[0]}</Avatar>
+            <Avatar size="large" shape="square">{company?.name?.[0]}</Avatar>
           )}
           <div className="font-semibold truncate">
             {company?.shortName || company?.name}
           </div>
-        </>
+        </div>
       }
     >
       <div className="flex flex-col h-full">
