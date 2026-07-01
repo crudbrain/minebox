@@ -69,7 +69,7 @@ export function PartnerFormModal({ open, onClose, partner }: PartnerFormModalPro
         name="code"
         rules={[{ required: true, message: "Code requis" }]}
       >
-        <Input disabled={isEdit} />
+        <Input />
       </Form.Item>
     </Modal>
   );

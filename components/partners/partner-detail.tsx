@@ -32,12 +32,16 @@ export function PartnerDetail({ partner }: PartnerDetailProps) {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button icon={<EditOutlined />} onClick={() => setEditOpen(true)}>
-          Modifier
-        </Button>
-      </div>
-      <Descriptions bordered column={isMobile ? 1 : 2}>
+      <Descriptions
+        bordered
+        column={isMobile ? 1 : 2}
+        title="Détails du partenaire"
+        extra={
+          <Button icon={<EditOutlined />} onClick={() => setEditOpen(true)}>
+            Modifier
+          </Button>
+        }
+      >
         <Descriptions.Item label="Code">{partner.code}</Descriptions.Item>
         <Descriptions.Item label="Solde">
           {formatCurrency(partner.balance, company?.currency)}
@@ -51,11 +55,19 @@ export function PartnerDetail({ partner }: PartnerDetailProps) {
       </Descriptions>
 
       <Card
-        style={{ borderColor: '#ffccc7', backgroundColor: '#fff2f0', marginTop: 24 }}
-        title={<span style={{ color: '#cf1322' }}>Zone danger</span>}
+        style={{
+          borderColor: "#ffccc7",
+          backgroundColor: "#fff2f0",
+          marginTop: 24,
+        }}
+        title={<span style={{ color: "#cf1322" }}>Zone danger</span>}
       >
         <p>Supprimer ce partenaire. Cette action est irréversible.</p>
-        <Button danger icon={<DeleteOutlined />} onClick={() => setDeleteOpen(true)}>
+        <Button
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => setDeleteOpen(true)}
+        >
           Supprimer
         </Button>
       </Card>
