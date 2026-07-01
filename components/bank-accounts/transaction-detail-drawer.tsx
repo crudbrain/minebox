@@ -222,9 +222,9 @@ Compte: *${accountName}*
             <Descriptions.Item label="No compte">
               {transaction.account?.accountNumber || "-"}
             </Descriptions.Item>
-            <Descriptions.Item label="Autres informations">
+            <Descriptions.Item label="Opérateur">
               {transaction.operator
-                ? `Opérateur: ${transaction.operator.name}`
+                ? transaction.operator.name
                 : "-"}
             </Descriptions.Item>
           </Descriptions>

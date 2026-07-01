@@ -123,7 +123,7 @@ export function TransferDetailDrawer({
             <Descriptions.Item label="Note">
               {transfer.message || "-"}
             </Descriptions.Item>
-            <Descriptions.Item label="Autres informations">
+            <Descriptions.Item label="Opérateur">
               {transfer.operator?.name || "-"}
             </Descriptions.Item>
           </Descriptions>
