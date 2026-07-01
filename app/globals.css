@@ -8,6 +8,11 @@
   --bg-elevated: #FFFFFF;
   --border-primary: #D5D3CD;
   --border-secondary: #E6E4DE;
+  --stat-blue: #6B7F99;
+  --stat-green: #6B9E7A;
+  --stat-amber: #C49A3C;
+  --stat-lavender: #8B7FA8;
+  --stat-rose: #B07A8A;
 }
 
 @theme inline {
@@ -19,6 +24,11 @@
   --color-bg-elevated: var(--bg-elevated);
   --color-border-primary: var(--border-primary);
   --color-border-secondary: var(--border-secondary);
+  --color-stat-blue: var(--stat-blue);
+  --color-stat-green: var(--stat-green);
+  --color-stat-amber: var(--stat-amber);
+  --color-stat-lavender: var(--stat-lavender);
+  --color-stat-rose: var(--stat-rose);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

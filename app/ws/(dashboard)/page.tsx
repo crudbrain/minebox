@@ -10,13 +10,14 @@ interface StatTileProps {
   icon: React.ReactNode;
   label: string;
   value: React.ReactNode;
+  colorClass: string;
 }
 
-function StatTile({ icon, label, value }: StatTileProps) {
+function StatTile({ icon, label, value, colorClass }: StatTileProps) {
   return (
     <div className="bg-bg-elevated border border-border-secondary rounded-md p-4 hover:border-primary transition-colors">
-      <span className="text-primary text-base block mb-3">{icon}</span>
-      <div className="text-2xl font-semibold text-foreground">{value}</div>
+      <span className={`${colorClass} text-base block mb-3`}>{icon}</span>
+      <div className={`text-2xl font-semibold ${colorClass}`}>{value}</div>
       <div className="text-sm text-foreground/60">{label}</div>
     </div>
   );
@@ -56,6 +57,7 @@ export default function DashboardPage() {
             icon={<BankOutlined />}
             label="Clients"
             value={stats?.bankAccounts?.numberOfAccounts ?? 0}
+            colorClass="text-stat-blue"
           />
           <StatTile
             icon={<DollarOutlined />}
@@ -64,6 +66,7 @@ export default function DashboardPage() {
               stats?.bankAccounts?.totalBanck ?? 0,
               company?.currency
             )}
+            colorClass="text-stat-green"
           />
           <StatTile
             icon={<DollarOutlined />}
@@ -72,6 +75,7 @@ export default function DashboardPage() {
               stats?.bankAccounts?.totalCredit ?? 0,
               company?.currency
             )}
+            colorClass="text-stat-amber"
           />
         </div>
       </section>
@@ -85,6 +89,7 @@ export default function DashboardPage() {
             icon={<TeamOutlined />}
             label="Partenaires"
             value={stats?.partners?.numberOfPartners ?? 0}
+            colorClass="text-stat-lavender"
           />
           <StatTile
             icon={<DollarOutlined />}
@@ -93,6 +98,7 @@ export default function DashboardPage() {
               stats?.partners?.totalPartnersCredit ?? 0,
               company?.currency
             )}
+            colorClass="text-stat-rose"
           />
         </div>
       </section>
