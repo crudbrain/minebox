@@ -18,14 +18,6 @@ export default function PartnerLayout({
   const { data: partner, isLoading } = usePartner(id);
   const { data: company } = useCompany();
 
-  if (isLoading) {
-    return <Skeleton active paragraph={{ rows: 8 }} />;
-  }
-
-  if (!partner) {
-    return <div>Partenaire non trouvé</div>;
-  }
-
   const tabs = useMemo(
     () => [
       { key: "transfers", label: "Transferts", path: `/ws/partners/${id}` },
@@ -33,6 +25,14 @@ export default function PartnerLayout({
     ],
     [id]
   );
+
+  if (isLoading) {
+    return <Skeleton active paragraph={{ rows: 8 }} />;
+  }
+
+  if (!partner) {
+    return <div>Partenaire non trouvé</div>;
+  }
 
   return (
     <div>

@@ -51,19 +51,25 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button icon={<EditOutlined />} onClick={() => setEditOpen(true)}>
-          Modifier
-        </Button>
-      </div>
-      <Descriptions bordered column={isMobile ? 1 : 2}>
+      <Descriptions
+        bordered
+        column={isMobile ? 1 : 2}
+        title="Détails du compte"
+        extra={
+          <Button icon={<EditOutlined />} onClick={() => setEditOpen(true)}>
+            Modifier
+          </Button>
+        }
+      >
         <Descriptions.Item label="Numéro de compte">
           {bankAccount.accountNumber}
         </Descriptions.Item>
         <Descriptions.Item label="Solde">
           {formatCurrency(bankAccount.balance, company?.currency)}
         </Descriptions.Item>
-        <Descriptions.Item label="Nom">{bankAccount.lastName}</Descriptions.Item>
+        <Descriptions.Item label="Nom">
+          {bankAccount.lastName}
+        </Descriptions.Item>
         <Descriptions.Item label="Postnom">
           {bankAccount.surname || "-"}
         </Descriptions.Item>
@@ -83,7 +89,10 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
           <Switch
             checked={bankAccount.blocked}
             loading={updateMutation.isPending}
-            onChange={(checked) => { setPendingBlocked(checked); setConfirmOpen(true); }}
+            onChange={(checked) => {
+              setPendingBlocked(checked);
+              setConfirmOpen(true);
+            }}
             checkedChildren="Bloqué"
             unCheckedChildren="Actif"
           />
@@ -106,11 +115,19 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
       </Descriptions>
 
       <Card
-        style={{ borderColor: '#ffccc7', backgroundColor: '#fff2f0', marginTop: 24 }}
-        title={<span style={{ color: '#cf1322' }}>Zone danger</span>}
+        style={{
+          borderColor: "#ffccc7",
+          backgroundColor: "#fff2f0",
+          marginTop: 24,
+        }}
+        title={<span style={{ color: "#cf1322" }}>Zone danger</span>}
       >
         <p>Supprimer ce compte. Cette action est irréversible.</p>
-        <Button danger icon={<DeleteOutlined />} onClick={() => setDeleteOpen(true)}>
+        <Button
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => setDeleteOpen(true)}
+        >
           Supprimer
         </Button>
       </Card>
@@ -140,8 +157,9 @@ export function BankAccountDetail({ bankAccount }: BankAccountDetailProps) {
         okButtonProps={{ loading: updateMutation.isPending }}
       >
         <p>
-          Voulez-vous {pendingBlocked ? "bloquer" : "activer"} le compte N° {bankAccount.accountNumber} ?
-          Cette action peut être annulée à tout moment.
+          Voulez-vous {pendingBlocked ? "bloquer" : "activer"} le compte N°{" "}
+          {bankAccount.accountNumber} ? Cette action peut être annulée à tout
+          moment.
         </p>
       </Modal>
     </div>
