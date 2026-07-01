@@ -39,7 +39,7 @@ export function UserDropdown({ collapsed }: { collapsed?: boolean }) {
   );
 
   return (
-    <Dropdown menu={{ items }} placement="topRight">
+    <Dropdown menu={{ items }} placement="topRight" overlayStyle={{ minWidth: 'max-content' }}>
       <div className={`flex items-center gap-3 cursor-pointer ${collapsed ? "justify-center" : ""}`}>
         <Avatar icon={<UserOutlined />} />
         {!collapsed && (

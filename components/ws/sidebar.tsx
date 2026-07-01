@@ -110,7 +110,7 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
-            className="ml-auto"
+            className={collapsed ? "mx-auto" : "ml-auto"}
           />
         )}
       </div>
