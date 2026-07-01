@@ -4,7 +4,7 @@ import { Form, Input, Button, Card, Typography, message } from "antd";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
-const { Title, Link } = Typography;
+const { Link } = Typography;
 
 interface LoginFormProps {
   hasCompany: boolean;
@@ -53,7 +53,6 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-layout">
       <Card className="w-full max-w-sm">
-        <Title level={3} className="text-center">Minebox</Title>
         <Form layout="vertical" onFinish={onFinish} disabled={loading}>
           <Form.Item
             label="Email"
