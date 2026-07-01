@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "antd";
 
 const tabs = [
-  { key: "company", label: "Company", path: "/ws/settings" },
+  { key: "company", label: "Entreprise", path: "/ws/settings" },
   { key: "users", label: "Utilisateurs", path: "/ws/settings/users" },
 ];
 

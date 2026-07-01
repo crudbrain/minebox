@@ -68,7 +68,7 @@ export default function SettingsPage() {
           <Descriptions.Item label="Email">
             {company.email || "—"}
           </Descriptions.Item>
-          <Descriptions.Item label="Statut">{company.status}</Descriptions.Item>
+          <Descriptions.Item label="Statut">{company.status === "ENABLED" ? "Activé" : "Désactivé"}</Descriptions.Item>
         </Descriptions>
       ) : (
         <div>Aucune entreprise trouvée.</div>

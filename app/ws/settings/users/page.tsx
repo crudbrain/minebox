@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   Table,
   Button,
@@ -11,6 +11,7 @@ import {
   Drawer,
   List,
   Descriptions,
+  Avatar,
 } from "antd";
 import {
   PlusOutlined,
@@ -34,6 +35,8 @@ import { UserEditDrawer } from "@/components/settings/user-edit-drawer";
 import { ConfirmDeleteModal } from "@/components/shared/confirm-delete-modal";
 
 import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+import { getHSLColor } from "@/lib/utils";
+import type { ColumnsType } from "antd/es/table";
 
 interface User {
   id: string;
@@ -73,9 +76,12 @@ export default function UsersPage() {
   });
 
   const users = usersData?.users || [];
-  const adminCount = users.filter(u => (u.role || "user") === "admin").length;
+  const adminCount = useMemo(
+    () => users.filter(u => (u.role || "user") === "admin").length,
+    [users]
+  );
 
-  const handleSetRole = async (userId: string, role: "admin" | "user") => {
+  const handleSetRole = useCallback(async (userId: string, role: "admin" | "user") => {
     const targetUser = users.find(u => u.id === userId);
     if (role === "user" && targetUser && (targetUser.role || "user") === "admin" && adminCount <= 1) {
       message.error("Impossible de rétrograder le dernier administrateur");
@@ -86,14 +92,14 @@ export default function UsersPage() {
         userId,
         role,
       });
-      message.success(`Rôle mis à jour : ${role}`);
+      message.success(`Rôle mis à jour : ${role === "admin" ? "Admin" : "Utilisateur"}`);
       refetch();
     } catch (error: any) {
       message.error(error.message || "Erreur lors de la mise à jour du rôle");
     }
-  };
+  }, [users, adminCount, refetch]);
 
-  const handleBan = async (userId: string) => {
+  const handleBan = useCallback(async (userId: string) => {
     Modal.confirm({
       title: "Bannir l'utilisateur",
       content: (
@@ -120,9 +126,9 @@ export default function UsersPage() {
         }
       },
     });
-  };
+  }, [refetch]);
 
-  const handleUnban = async (userId: string) => {
+  const handleUnban = useCallback(async (userId: string) => {
     try {
       await authClient.admin.unbanUser({ userId });
       message.success("Utilisateur débanni");
@@ -130,9 +136,9 @@ export default function UsersPage() {
     } catch (error: any) {
       message.error(error.message || "Erreur lors du débannissement");
     }
-  };
+  }, [refetch]);
 
-  const handleSetPassword = async (userId: string) => {
+  const handleSetPassword = useCallback(async (userId: string) => {
     Modal.confirm({
       title: "Définir un nouveau mot de passe",
       content: (
@@ -164,9 +170,9 @@ export default function UsersPage() {
         }
       },
     });
-  };
+  }, []);
 
-  const handleRevokeSessions = async (userId: string) => {
+  const handleRevokeSessions = useCallback(async (userId: string) => {
     if (userId === currentUserId) {
       message.error("Vous ne pouvez pas révoquer vos propres sessions");
       return;
@@ -183,9 +189,9 @@ export default function UsersPage() {
         }
       },
     });
-  };
+  }, [currentUserId]);
 
-  const handleImpersonate = async (userId: string) => {
+  const handleImpersonate = useCallback(async (userId: string) => {
     try {
       await authClient.admin.impersonateUser({ userId });
       message.success("Impersonification réussie");
@@ -193,13 +199,13 @@ export default function UsersPage() {
     } catch (error: any) {
       message.error(error.message || "Erreur lors de l'impersonification");
     }
-  };
+  }, []);
 
-  const handleDelete = (userId: string) => {
+  const handleDelete = useCallback((userId: string) => {
     setDeleteUserId(userId);
-  };
+  }, []);
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = useCallback(async () => {
     if (!deleteUserId) return;
     const targetUser = users.find(u => u.id === deleteUserId);
     if (deleteUserId === currentUserId) {
@@ -225,145 +231,169 @@ export default function UsersPage() {
       setDeleteLoading(false);
       setDeleteUserId(null);
     }
-  };
+  }, [users, adminCount, currentUserId, refetch]);
 
-  const handleViewSessions = async (user: User) => {
+  const handleViewSessions = useCallback(async (user: User) => {
     setSessionsUser(user);
-  };
+  }, []);
 
-  const columns = [
-    {
-      title: "Nom",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Rôle",
-      dataIndex: "role",
-      key: "role",
-      render: (role?: string) => (
-        <Tag color={role === "admin" ? "red" : "blue"}>{role || "user"}</Tag>
-      ),
-    },
-    {
-      title: "Vérifié",
-      dataIndex: "emailVerified",
-      key: "emailVerified",
-      render: (verified: boolean) =>
-        verified ? (
-          <Tag color="green" icon={<CheckCircleOutlined />}>Oui</Tag>
-        ) : (
-          <Tag color="orange">Non</Tag>
+  const columns = useMemo<ColumnsType<User>>(
+    () => [
+      {
+        title: "Photo",
+        dataIndex: "name",
+        key: "name",
+        responsive: ["md"],
+        render: (_, record) => (
+          <Avatar
+            style={{
+              backgroundColor: getHSLColor(
+                `${record.name}`
+              ),
+            }}
+          >
+            {record.name?.charAt(0).toUpperCase()}
+          </Avatar>
         ),
-    },
-    {
-      title: "Banni",
-      dataIndex: "banned",
-      key: "banned",
-      render: (banned: boolean | null, record: User) =>
-        banned ? (
-          <Tag color="red" icon={<StopOutlined />}>
-            {record.banReason || "Banni"}
-          </Tag>
-        ) : (
-          <Tag color="default">Non</Tag>
-        ),
-    },
-    {
-      title: "Créé le",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: Date) => date.toLocaleDateString("fr-FR"),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_: any, record: User) => {
-        const items = [
-          {
-            key: "edit",
-            icon: <EditOutlined />,
-            label: "Modifier",
-            onClick: () => setEditUser(record),
-          },
-          {
-            key: "role-admin",
-            icon: <SafetyCertificateOutlined />,
-            label: (record.role || "user") === "admin" ? "Rétrograder en user" : "Promouvoir admin",
-            disabled: (record.role || "user") === "admin" && adminCount <= 1,
-            title: (record.role || "user") === "admin" && adminCount <= 1 ? "Impossible de rétrograder le dernier administrateur" : undefined,
-            onClick: () =>
-              handleSetRole(record.id, (record.role || "user") === "admin" ? "user" : "admin"),
-          },
-          {
-            key: "password",
-            icon: <KeyOutlined />,
-            label: "Définir mot de passe",
-            onClick: () => handleSetPassword(record.id),
-          },
-          record.banned
-            ? {
-                key: "unban",
-                icon: <CheckCircleOutlined />,
-                label: "Débannir",
-                onClick: () => handleUnban(record.id),
-              }
-            : {
-                key: "ban",
-                icon: <StopOutlined />,
-                label: "Bannir",
-                onClick: () => handleBan(record.id),
-              },
-          {
-            key: "sessions",
-            icon: <EyeOutlined />,
-            label: "Voir sessions",
-            onClick: () => handleViewSessions(record),
-          },
-          {
-            key: "revoke",
-            icon: <LogoutOutlined />,
-            label: "Révoquer sessions",
-            disabled: record.id === currentUserId,
-            title: record.id === currentUserId ? "Vous ne pouvez pas révoquer vos propres sessions" : undefined,
-            onClick: () => handleRevokeSessions(record.id),
-          },
-          {
-            key: "impersonate",
-            icon: <UserSwitchOutlined />,
-            label: "Impersonifier",
-            onClick: () => handleImpersonate(record.id),
-          },
-          { key: "divider", type: "divider" as const },
-          {
-            key: "delete",
-            icon: <DeleteOutlined />,
-            label: "Supprimer",
-            danger: true,
-            disabled: record.id === currentUserId || ((record.role || "user") === "admin" && adminCount <= 1),
-            title: record.id === currentUserId
-              ? "Vous ne pouvez pas supprimer votre propre compte"
-              : (record.role || "user") === "admin" && adminCount <= 1
-                ? "Impossible de supprimer le dernier administrateur"
-                : undefined,
-            onClick: () => handleDelete(record.id),
-          },
-        ];
-
-        return (
-          <Dropdown menu={{ items }} placement="bottomRight" trigger={["click"]}
-            arrow>
-            <Button icon={<MoreOutlined />} size="small" />
-          </Dropdown>
-        );
+        width: 58,
+        align: "center",
       },
-    },
-  ];
+      {
+        title: "Nom",
+        dataIndex: "name",
+        key: "name",
+      },
+      {
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
+      },
+      {
+        title: "Rôle",
+        dataIndex: "role",
+        key: "role",
+        render: (role?: string) => (
+          <Tag color={role === "admin" ? "red" : "blue"}>
+            {role === "admin" ? "Admin" : "Utilisateur"}
+          </Tag>
+        ),
+      },
+      {
+        title: "Vérifié",
+        dataIndex: "emailVerified",
+        key: "emailVerified",
+        render: (verified: boolean) =>
+          verified ? (
+            <Tag color="green" icon={<CheckCircleOutlined />}>Oui</Tag>
+          ) : (
+            <Tag color="orange">Non</Tag>
+          ),
+      },
+      {
+        title: "Banni",
+        dataIndex: "banned",
+        key: "banned",
+        render: (banned, record) =>
+          banned ? (
+            <Tag color="red" icon={<StopOutlined />}>
+              {record.banReason || "Banni"}
+            </Tag>
+          ) : (
+            <Tag color="default">Non</Tag>
+          ),
+      },
+      {
+        title: "Créé le",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        render: (date: Date) => date.toLocaleDateString("fr-FR"),
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        render: (_, record) => {
+          const items = [
+            {
+              key: "edit",
+              icon: <EditOutlined />,
+              label: "Modifier",
+              onClick: () => setEditUser(record),
+            },
+            {
+              key: "role-admin",
+              icon: <SafetyCertificateOutlined />,
+              label: (record.role || "user") === "admin" ? "Rétrograder en user" : "Promouvoir admin",
+              disabled: (record.role || "user") === "admin" && adminCount <= 1,
+              title: (record.role || "user") === "admin" && adminCount <= 1 ? "Impossible de rétrograder le dernier administrateur" : undefined,
+              onClick: () =>
+                handleSetRole(record.id, (record.role || "user") === "admin" ? "user" : "admin"),
+            },
+            {
+              key: "password",
+              icon: <KeyOutlined />,
+              label: "Définir mot de passe",
+              onClick: () => handleSetPassword(record.id),
+            },
+            record.banned
+              ? {
+                  key: "unban",
+                  icon: <CheckCircleOutlined />,
+                  label: "Débannir",
+                  onClick: () => handleUnban(record.id),
+                }
+              : {
+                  key: "ban",
+                  icon: <StopOutlined />,
+                  label: "Bannir",
+                  onClick: () => handleBan(record.id),
+                },
+            {
+              key: "sessions",
+              icon: <EyeOutlined />,
+              label: "Voir sessions",
+              onClick: () => handleViewSessions(record),
+            },
+            {
+              key: "revoke",
+              icon: <LogoutOutlined />,
+              label: "Révoquer sessions",
+              disabled: record.id === currentUserId,
+              title: record.id === currentUserId ? "Vous ne pouvez pas révoquer vos propres sessions" : undefined,
+              onClick: () => handleRevokeSessions(record.id),
+            },
+            {
+              key: "impersonate",
+              icon: <UserSwitchOutlined />,
+              label: "Impersonifier",
+              onClick: () => handleImpersonate(record.id),
+            },
+            { key: "divider", type: "divider" as const },
+            {
+              key: "delete",
+              icon: <DeleteOutlined />,
+              label: "Supprimer",
+              danger: true,
+              disabled: record.id === currentUserId || ((record.role || "user") === "admin" && adminCount <= 1),
+              title: record.id === currentUserId
+                ? "Vous ne pouvez pas supprimer votre propre compte"
+                : (record.role || "user") === "admin" && adminCount <= 1
+                  ? "Impossible de supprimer le dernier administrateur"
+                  : undefined,
+              onClick: () => handleDelete(record.id),
+            },
+          ];
+
+          return (
+            <Dropdown menu={{ items }} placement="bottomRight" trigger={["click"]}
+              arrow>
+              <Button icon={<MoreOutlined />} size="small" />
+            </Dropdown>
+          );
+        },
+        width: 64,
+        align: "center",
+      },
+    ], [adminCount, currentUserId]);
 
   return (
     <div>

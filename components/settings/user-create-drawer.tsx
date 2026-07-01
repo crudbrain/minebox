@@ -75,6 +75,7 @@ export function UserCreateDrawer({ open, onClose, onSuccess }: UserCreateDrawerP
         email: values.email,
         password: values.password,
         role: values.role as "admin" | "user",
+        data: { emailVerified: true },
       });
       message.success("Utilisateur créé avec succès");
       form.resetFields();
