@@ -1,11 +1,11 @@
 'use client';
 
-import { Table, Input, Typography } from "antd";
+import { Table, Input, Typography, Avatar } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { usePartners } from "@/lib/hooks/use-partners";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getHSLColor } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
 import { memo, useMemo, useCallback } from "react";
 import type { ColumnsType } from "antd/es/table";
@@ -39,6 +39,26 @@ export const PartnerTable = memo(function PartnerTable() {
 
   const columns = useMemo<ColumnsType<PartnerRecord>>(
     () => [
+      {
+    title: "Photo",
+    dataIndex: "code",
+    key: "code",
+    render: (_, record) => (
+      <Avatar
+        shape="square"
+        style={{
+          backgroundColor: getHSLColor(
+            `${record.code}`
+          ),
+        }}
+      >
+        {record.code?.charAt(0).toUpperCase()}
+      
+      </Avatar>
+    ),
+    width: 58,
+    align: "center",
+  },
       {
         title: "Code",
         dataIndex: "code",

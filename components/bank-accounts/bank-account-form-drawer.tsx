@@ -118,7 +118,7 @@ export function BankAccountFormDrawer({
       >
         <Card title="Identité" size="small" style={{ marginBottom: 16 }}>
           <Form.Item label="Numéro de compte" name="accountNumber">
-            <Input disabled={isEdit} />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             label="Nom"

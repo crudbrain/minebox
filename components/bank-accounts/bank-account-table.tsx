@@ -1,11 +1,11 @@
 'use client';
 
-import { Table, Tag, Input, Typography } from "antd";
+import { Table, Tag, Input, Typography, Avatar } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useBankAccounts } from "@/lib/hooks/use-bank-accounts";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getHSLColor } from "@/lib/utils";
 import { useCompany } from "@/lib/hooks/use-company";
 import { memo, useMemo, useCallback } from "react";
 import type { ColumnsType } from "antd/es/table";
@@ -16,6 +16,7 @@ interface BankAccountRecord {
   firstName: string;
   lastName: string;
   surname: string;
+  gender: string;
   phone: string;
   balance: number;
   blocked: boolean;
@@ -45,17 +46,46 @@ export const BankAccountTable = memo(function BankAccountTable() {
   const columns = useMemo<ColumnsType<BankAccountRecord>>(
     () => [
       {
-        title: "Numéro de compte",
+        title: "No",
         dataIndex: "accountNumber",
         key: "accountNumber",
+        width: 80,
+      },
+      {
+        title: "Photo",
+        dataIndex: "owner",
+        key: "owner",
+        responsive: ["md"],
+        render: (_, record) => (
+          <Avatar
+            style={{
+              backgroundColor: getHSLColor(
+                `${record.firstName} ${record.lastName} ${record.surname}`,
+              ),
+            }}
+          >
+            {record.firstName?.charAt(0).toUpperCase()}
+            {record.lastName?.charAt(0).toUpperCase()}
+          </Avatar>
+        ),
+        width: 58,
+        align: "center",
       },
       {
         title: "Nom complet",
         key: "fullName",
-        render: (_: unknown, record: BankAccountRecord) =>
+        render: (_, record) =>
           [record.lastName, record.surname, record.firstName]
             .filter(Boolean)
             .join(" "),
+      },
+      {
+        title: "Genre",
+        dataIndex: "gender",
+        key: "gender",
+        width: 52,
+        render: (_, record) => `${record.gender === "M" ? "M" : "F"}`,
+        align: "center",
       },
       {
         title: "Téléphone",
@@ -85,7 +115,7 @@ export const BankAccountTable = memo(function BankAccountTable() {
           ),
       },
     ],
-    [company?.currency]
+    [company?.currency],
   );
 
   const handleSearchChange = useCallback(

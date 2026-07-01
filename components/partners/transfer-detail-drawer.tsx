@@ -106,7 +106,7 @@ export function TransferDetailDrawer({
             <Descriptions.Item label="Date">
               {formatDate(transfer.date)}
             </Descriptions.Item>
-            <Descriptions.Item label="Type">
+            <Descriptions.Item label="Type d'opération">
               {getTypeLabel(transfer.type)}
             </Descriptions.Item>
             <Descriptions.Item label="Expéditeur">

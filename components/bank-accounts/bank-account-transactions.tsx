@@ -384,7 +384,7 @@ export function BankAccountTransactions({
         )}
       >
         <Form.Item
-          label="Type"
+          label="Type d'opération"
           name="type"
           rules={[{ required: true, message: "Type requis" }]}
         >
@@ -395,13 +395,13 @@ export function BankAccountTransactions({
           ]} />
         </Form.Item>
         <Form.Item
-          label="Date"
+          label="Date de l'opération"
           name="date"
           rules={[{ required: true, message: "Date requise" }]}
         >
-          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm" />
+          <DatePicker className="w-full" showTime format="DD/MM/YYYY HH:mm:ss" />
         </Form.Item>
-        <Form.Item label="Titre" name="title">
+        <Form.Item label="Intitulé" name="title">
           <Input />
         </Form.Item>
         <Form.Item
@@ -450,7 +450,7 @@ export function BankAccountTransactions({
           </>
         )}
 
-        <Form.Item label="Message" name="message">
+        <Form.Item label="Message (Observation)" name="message">
           <Input.TextArea />
         </Form.Item>
       </Modal>
