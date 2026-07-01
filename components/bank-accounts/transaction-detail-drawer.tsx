@@ -163,7 +163,7 @@ Compte: *${accountName}*
       }
     >
       <div className="flex gap-2 mb-4">
-        <Button icon={<PrinterOutlined />} onClick={handlePrint}>
+        <Button icon={<PrinterOutlined />} onClick={() => handlePrint()}>
           Imprimer
         </Button>
         <Button icon={<FileImageOutlined />} onClick={handleExportJpg}>

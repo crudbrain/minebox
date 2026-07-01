@@ -87,6 +87,10 @@ export function BankAccountTransactions({
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+      setPrintData(null);
+    },
   });
 
   const handlePrintClick = async () => {
@@ -110,12 +114,9 @@ export function BankAccountTransactions({
 
   useEffect(() => {
     if (printData !== null) {
-      // Small delay to ensure DOM has rendered
       const timer = setTimeout(() => {
         handlePrint();
-        setIsPrinting(false);
-        setPrintData(null);
-      }, 100);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [printData, handlePrint]);
@@ -513,12 +514,6 @@ export function BankAccountTransactions({
         @media print {
           .print-only-header {
             display: block !important;
-          }
-          body * {
-            visibility: hidden;
-          }
-          .print-section, .print-section * {
-            visibility: visible;
           }
           .print-section {
             position: static !important;

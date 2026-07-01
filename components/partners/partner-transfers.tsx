@@ -80,6 +80,10 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+      setPrintData(null);
+    },
   });
 
   const handlePrintClick = async () => {
@@ -105,9 +109,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
     if (printData !== null) {
       const timer = setTimeout(() => {
         handlePrint();
-        setIsPrinting(false);
-        setPrintData(null);
-      }, 100);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [printData, handlePrint]);
@@ -430,12 +432,6 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         @media print {
           .print-only-header {
             display: block !important;
-          }
-          body * {
-            visibility: hidden;
-          }
-          .print-section, .print-section * {
-            visibility: visible;
           }
           .print-section {
             position: static !important;
