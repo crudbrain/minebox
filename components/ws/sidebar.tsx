@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Layout, Menu, Avatar, Skeleton, Button, Drawer } from "antd";
 import {
   DashboardOutlined,
@@ -29,6 +29,8 @@ function getActiveKey(pathname: string, keys: string[]): string {
   return best;
 }
 
+const MENU_KEYS = ["/ws", "/ws/bank-accounts", "/ws/partners", "/ws/settings"];
+
 interface SidebarProps {
   company?: any;
   mobileOpen?: boolean;
@@ -44,41 +46,43 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
   const [collapsed, setCollapsed] = useState(false);
   const { isMobile } = useBreakpoint();
 
-  const menuItems = [
-    {
-      key: "/ws",
-      icon: <DashboardOutlined />,
-      label: <Link href="/ws">Dashboard</Link>,
-    },
-    {
-      key: "/ws/bank-accounts",
-      icon: <BankOutlined />,
-      label: <Link href="/ws/bank-accounts">Banque et crédits</Link>,
-    },
-    {
-      key: "/ws/partners",
-      icon: <TeamOutlined />,
-      label: <Link href="/ws/partners">Partenaires et crédits</Link>,
-    },
-    ...(session?.user?.role === "admin"
-      ? [
-          {
-            key: "/ws/settings",
-            icon: <SettingOutlined />,
-            label: <Link href="/ws/settings">Paramètres</Link>,
-          },
-        ]
-      : []),
-  ];
+  const menuItems = useMemo(
+    () => [
+      {
+        key: "/ws",
+        icon: <DashboardOutlined />,
+        label: <Link href="/ws">Dashboard</Link>,
+      },
+      {
+        key: "/ws/bank-accounts",
+        icon: <BankOutlined />,
+        label: <Link href="/ws/bank-accounts">Banque et crédits</Link>,
+      },
+      {
+        key: "/ws/partners",
+        icon: <TeamOutlined />,
+        label: <Link href="/ws/partners">Partenaires et crédits</Link>,
+      },
+      ...(session?.user?.role === "admin"
+        ? [
+            {
+              key: "/ws/settings",
+              icon: <SettingOutlined />,
+              label: <Link href="/ws/settings">Paramètres</Link>,
+            },
+          ]
+        : []),
+    ],
+    [session?.user?.role]
+  );
 
-  const allKeys = menuItems.map((item) => item.key);
-  const activeKey = getActiveKey(pathname, allKeys);
+  const activeKey = useMemo(() => getActiveKey(pathname, MENU_KEYS), [pathname]);
 
-  const handleMenuClick = () => {
+  const handleMenuClick = useCallback(() => {
     if (isMobile && onMobileClose) {
       onMobileClose();
     }
-  };
+  }, [isMobile, onMobileClose]);
 
   const sidebarContent = (
     <>
@@ -87,15 +91,17 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
           <Skeleton active avatar paragraph={{ rows: 1 }} />
         ) : (
           <>
-            {company?.logo ? (
-              <Avatar src={company.logo} size="large" />
-            ) : (
-              <Avatar size="large">{company?.name?.[0]}</Avatar>
-            )}
             {!collapsed && (
-              <div className="font-semibold truncate">
-                {company?.shortName || company?.name}
-              </div>
+              <>
+                {company?.logo ? (
+                  <Avatar src={company.logo} size="large" />
+                ) : (
+                  <Avatar size="large">{company?.name?.[0]}</Avatar>
+                )}
+                <div className="font-semibold truncate">
+                  {company?.shortName || company?.name}
+                </div>
+              </>
             )}
           </>
         )}
@@ -130,7 +136,7 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
         placement="left"
         open={mobileOpen}
         onClose={onMobileClose}
-        width={280}
+        size={280}
         closable={false}
         styles={{ body: { padding: 0 } }}
       >
@@ -142,16 +148,18 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
   }
 
   return (
-    <Sider
-      width={260}
-      collapsed={collapsed}
-      collapsedWidth={80}
-      trigger={null}
-      className="h-screen"
-      theme="light"
-      style={{ display: "flex", flexDirection: "column" }}
-    >
-      {sidebarContent}
-    </Sider>
+      <Sider
+        width={260}
+        collapsed={collapsed}
+        collapsedWidth={80}
+        trigger={null}
+        className="h-screen"
+        theme="light"
+        style={{ display: "flex", flexDirection: "column" }}
+      >
+        <div className="flex flex-col h-full">
+          {sidebarContent}
+        </div>
+      </Sider>
   );
 }

@@ -15,8 +15,4 @@ export const auth = betterAuth({
     admin(),
     nextCookies(),
   ],
-  trustedOrigins: [
-    process.env.BETTER_AUTH_URL as string,
-    "http://localhost:3000",
-  ],
 });

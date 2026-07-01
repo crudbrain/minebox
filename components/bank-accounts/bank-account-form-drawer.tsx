@@ -84,7 +84,7 @@ export function BankAccountFormDrawer({
   return (
     <Drawer
       title={isEdit ? "Modifier le compte" : "Nouveau compte"}
-      width={isMobile ? "100vw" : 520}
+      size={isMobile ? "100vw" : 520}
       open={open}
       onClose={onClose}
       destroyOnClose

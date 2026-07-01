@@ -63,7 +63,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
   return (
     <Drawer
       title="Modifier l'entreprise"
-      width={isMobile ? "100vw" : 520}
+      size={isMobile ? "100vw" : 520}
       open={open}
       onClose={onClose}
       footer={

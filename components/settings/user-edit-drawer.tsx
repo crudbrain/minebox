@@ -56,7 +56,7 @@ export function UserEditDrawer({ open, onClose, user, onSuccess }: UserEditDrawe
   return (
     <Drawer
       title="Modifier l'utilisateur"
-      width={isMobile ? "100vw" : 420}
+      size={isMobile ? "100vw" : 420}
       open={open}
       onClose={() => {
         form.resetFields();

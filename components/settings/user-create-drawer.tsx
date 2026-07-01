@@ -45,7 +45,7 @@ export function UserCreateDrawer({ open, onClose, onSuccess }: UserCreateDrawerP
   return (
     <Drawer
       title="Créer un utilisateur"
-      width={isMobile ? "100vw" : 420}
+      size={isMobile ? "100vw" : 420}
       open={open}
       onClose={() => {
         form.resetFields();

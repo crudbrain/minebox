@@ -69,7 +69,7 @@ export function TransferDetailDrawer({
       title="Détails du transfert"
       open={open}
       onClose={onClose}
-      width={isMobile ? "100vw" : 480}
+      size={isMobile ? "100vw" : 480}
       extra={
         <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">
           <Button icon={<MoreOutlined />} />
