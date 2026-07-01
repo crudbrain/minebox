@@ -137,12 +137,22 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
         open={mobileOpen}
         onClose={onMobileClose}
         size={280}
-        closable={{placement:"end"}}
+        closable={{ placement: "end" }}
         styles={{ body: { padding: 0 } }}
+        title={
+          <>
+            {company?.logo ? (
+              <Avatar src={company.logo} size="large" />
+            ) : (
+              <Avatar size="large">{company?.name?.[0]}</Avatar>
+            )}
+            <div className="font-semibold truncate">
+              {company?.shortName || company?.name}
+            </div>
+          </>
+        }
       >
-        <div className="flex flex-col h-full">
-          {sidebarContent}
-        </div>
+        <div className="flex flex-col h-full">{sidebarContent}</div>
       </Drawer>
     );
   }

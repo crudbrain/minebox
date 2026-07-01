@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const partner = await prisma.partner.create({
-      data: parsed.data,
+      data: { ...parsed.data, balance: 0 },
     });
 
     return NextResponse.json(partner, { status: 201 });

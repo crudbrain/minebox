@@ -412,7 +412,7 @@ export function BankAccountTransactions({
           <InputNumber min={0.01} step={0.01} className="w-full" addonAfter={company?.currency} />
         </Form.Item>
         <Form.Item label="Quantité d'or" name="goldQuantity">
-          <InputNumber min={0.01} step={0.01} className="w-full" />
+          <Input />
         </Form.Item>
 
         {transactionType === "TRANSFER" && (

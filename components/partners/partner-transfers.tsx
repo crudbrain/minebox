@@ -369,7 +369,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         </Form.Item>
         {transferType === "GOLD_TRANSFER" && (
           <Form.Item label="Quantité d'or" name="goldQuantity">
-            <InputNumber min={0.01} step={0.01} className="w-full" />
+            <Input />
           </Form.Item>
         )}
         <Form.Item label="Message" name="message">

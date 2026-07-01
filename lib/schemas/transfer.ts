@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const transferCreateSchema = z.object({
-  date: z.string().datetime().or(z.date()),
+  date: z.iso.datetime().or(z.date()),
   type: z.enum(["MONEY_TRANSFER", "GOLD_TRANSFER"]),
   amount: z.number().positive("Le montant doit être positif"),
   goldQuantity: z.string().optional(),
@@ -11,7 +11,7 @@ export const transferCreateSchema = z.object({
 });
 
 export const transferUpdateSchema = z.object({
-  date: z.string().datetime().or(z.date()).optional(),
+  date: z.iso.datetime().or(z.date()).optional(),
   amount: z.number().positive("Le montant doit être positif").optional(),
   goldQuantity: z.string().optional(),
   sender: z.string().optional(),
