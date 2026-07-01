@@ -116,7 +116,7 @@ export function CompanyEditDrawer({ open, onClose, company }: CompanyEditDrawerP
           <Input />
         </Form.Item>
         <Form.Item name="address" label="Adresse">
-          <Input />
+          <Input.TextArea rows={3} />
         </Form.Item>
         <Form.Item name="webSiteUrl" label="Site web">
           <Input />

@@ -170,7 +170,7 @@ export function SetupForm({ code }: { code: string }) {
             <Input />
           </Form.Item>
           <Form.Item label="Adresse" name="address">
-            <Input />
+            <Input.TextArea rows={3} />
           </Form.Item>
 
           <Divider titlePlacement="left">Contact & Divers</Divider>

@@ -176,7 +176,7 @@ export function BankAccountFormDrawer({
             <Input />
           </Form.Item>
           <Form.Item label="Adresse" name="address">
-            <Input />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </Card>
       </Form>

@@ -113,6 +113,8 @@ export const BankAccountTable = memo(function BankAccountTable() {
           ) : (
             <Tag color="green">Actif</Tag>
           ),
+        width: 80,
+        align: "center",
       },
     ],
     [company?.currency],

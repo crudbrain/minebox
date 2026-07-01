@@ -389,9 +389,9 @@ export function BankAccountTransactions({
           rules={[{ required: true, message: "Type requis" }]}
         >
           <Select placeholder="Sélectionner" disabled={!!editingTransaction} options={[
-            { value: "DEPOSIT", label: "Entrée (Encaissement)" },
-            { value: "WITHDRAWAL", label: "Sortie (Décaissement)" },
-            { value: "TRANSFER", label: "Transfert" },
+            { value: "DEPOSIT", label: "+ Entrée (Encaissement)" },
+            { value: "WITHDRAWAL", label: "– Sortie (Décaissement)" },
+            { value: "TRANSFER", label: "⇄ Transfert" },
           ]} />
         </Form.Item>
         <Form.Item

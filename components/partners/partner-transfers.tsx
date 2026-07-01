@@ -343,7 +343,7 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         >
           <Select placeholder="Sélectionner" disabled={!!editingTransfer} options={[
             { value: "MONEY_TRANSFER", label: "Transfert d'argent" },
-            { value: "GOLD_TRANSFER", label: "Transfert d'or" },
+            { value: "GOLD_TRANSFER", label: "Expédition de l'or" },
           ]} />
         </Form.Item>
         <Form.Item
