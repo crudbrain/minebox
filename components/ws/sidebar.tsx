@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from "react";
-import { Layout, Menu, Avatar, Skeleton, Button, Drawer } from "antd";
+import { Layout, Avatar, Skeleton, Button } from "antd";
 import {
   DashboardOutlined,
   BankOutlined,
@@ -14,8 +14,9 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useCompany } from "@/lib/hooks/use-company";
 import { useSession } from "@/lib/hooks/use-session";
-import { UserDropdown } from "./user-dropdown";
 import { useBreakpoint } from "@/lib/hooks/use-breakpoint";
+import { SidebarContent } from "./sidebar-content";
+import { MobileSidebarDrawer } from "./mobile-sidebar-drawer";
 
 const { Sider } = Layout;
 
@@ -84,92 +85,64 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
     }
   }, [isMobile, onMobileClose]);
 
-  const sidebarContent = (
-    <>
-      <div className="p-4 flex items-center gap-3 border-b border-border-secondary shrink-0">
-        {isLoading ? (
-          <Skeleton active avatar paragraph={{ rows: 1 }} />
-        ) : (
-          <>
-            {!collapsed && (
-              <>
-                {company?.logo ? (
-                  <Avatar src={company.logo} size="large" />
-                ) : (
-                  <Avatar size="large">{company?.name?.[0]}</Avatar>
-                )}
-                <div className="font-semibold truncate">
-                  {company?.shortName || company?.name}
-                </div>
-              </>
-            )}
-          </>
-        )}
-        {!isMobile && (
+  if (isMobile) {
+    return (
+      <MobileSidebarDrawer
+        open={mobileOpen}
+        onClose={onMobileClose}
+        menuItems={menuItems}
+        activeKey={activeKey}
+        onMenuClick={handleMenuClick}
+        company={companyProp}
+      />
+    );
+  }
+
+  return (
+    <Sider
+      width={260}
+      collapsed={collapsed}
+      collapsedWidth={80}
+      trigger={null}
+      className="h-screen"
+      theme="light"
+      style={{ display: "flex", flexDirection: "column" }}
+    >
+      <div className="flex flex-col h-full">
+        <div className="p-4 flex items-center gap-3 border-b border-border-secondary shrink-0">
+          {isLoading ? (
+            <Skeleton active avatar paragraph={{ rows: 1 }} />
+          ) : (
+            <>
+              {!collapsed && (
+                <>
+                  {company?.logo ? (
+                    <Avatar src={company.logo} size="large" />
+                  ) : (
+                    <Avatar size="large">{company?.name?.[0]}</Avatar>
+                  )}
+                  <div className="font-semibold truncate">
+                    {company?.shortName || company?.name}
+                  </div>
+                </>
+              )}
+            </>
+          )}
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             className={collapsed ? "mx-auto" : "ml-auto"}
           />
-        )}
-      </div>
+        </div>
 
-      <div className="flex-1 py-4 overflow-auto">
-        <Menu
-          mode="inline"
-          selectedKeys={[activeKey]}
-          items={menuItems}
-          onClick={handleMenuClick}
+        <SidebarContent
+          menuItems={menuItems}
+          activeKey={activeKey}
+          onMenuClick={handleMenuClick}
+          collapsed={collapsed}
         />
       </div>
-
-      <div className="p-4 border-t border-border-secondary shrink-0">
-        <UserDropdown collapsed={collapsed} />
-      </div>
-    </>
-  );
-
-  if (isMobile) {
-    return (
-      <Drawer
-        placement="left"
-        open={mobileOpen}
-        onClose={onMobileClose}
-        size={280}
-        closable={{ placement: "end" }}
-        styles={{ body: { padding: 0 } }}
-        title={
-          <>
-            {company?.logo ? (
-              <Avatar src={company.logo} size="large" />
-            ) : (
-              <Avatar size="large">{company?.name?.[0]}</Avatar>
-            )}
-            <div className="font-semibold truncate">
-              {company?.shortName || company?.name}
-            </div>
-          </>
-        }
-      >
-        <div className="flex flex-col h-full">{sidebarContent}</div>
-      </Drawer>
-    );
-  }
-
-  return (
-      <Sider
-        width={260}
-        collapsed={collapsed}
-        collapsedWidth={80}
-        trigger={null}
-        className="h-screen"
-        theme="light"
-        style={{ display: "flex", flexDirection: "column" }}
-      >
-        <div className="flex flex-col h-full">
-          {sidebarContent}
-        </div>
-      </Sider>
+    </Sider>
   );
 }
