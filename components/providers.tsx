@@ -1,9 +1,14 @@
 'use client';
 
 import { ConfigProvider } from 'antd';
+import frFR from 'antd/es/locale/fr_FR';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import dayjs from 'dayjs';
+import 'dayjs/locale/fr';
+
+dayjs.locale('fr');
 
 const queryClient = new QueryClient();
 
@@ -35,7 +40,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <NuqsAdapter>
         <AntdRegistry>
-          <ConfigProvider theme={theme}>
+          <ConfigProvider theme={theme} locale={frFR}>
             {children}
           </ConfigProvider>
         </AntdRegistry>
