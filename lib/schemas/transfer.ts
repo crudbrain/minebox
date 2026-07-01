@@ -5,7 +5,7 @@ export const transferCreateSchema = z.object({
   type: z.enum(["MONEY_TRANSFER", "GOLD_TRANSFER"]),
   amount: z.number().positive("Le montant doit être positif"),
   goldQuantity: z.string().optional(),
-  sender: z.string().optional(),
+  sender: z.string().default(""),
   message: z.string().default(""),
   partnerId: z.string().min(1, "Partenaire requis"),
 });
@@ -14,7 +14,7 @@ export const transferUpdateSchema = z.object({
   date: z.iso.datetime().or(z.date()).optional(),
   amount: z.number().positive("Le montant doit être positif").optional(),
   goldQuantity: z.string().optional(),
-  sender: z.string().optional(),
+  sender: z.string().default(""),
   message: z.string().optional(),
 });
 
