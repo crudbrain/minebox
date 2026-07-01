@@ -1,6 +1,6 @@
 'use client';
 
-import { Table, Input } from "antd";
+import { Table, Input, Typography } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -49,7 +49,11 @@ export const PartnerTable = memo(function PartnerTable() {
         dataIndex: "balance",
         key: "balance",
         align: "right",
-        render: (balance: number) => formatCurrency(balance, company?.currency),
+        render: (balance: number) => (
+          <Typography.Text type={balance >= 0 ? "success" : "danger"}>
+            {formatCurrency(balance, company?.currency)}
+          </Typography.Text>
+        ),
       },
     ],
     [company?.currency]

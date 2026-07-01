@@ -46,7 +46,7 @@ export default function BankAccountLayout({
             .join(" ")}
         </h1>
         <p className="text-lg text-gray-700 mb-4 break-words">
-          {formatCurrency(bankAccount.balance, company?.currency)}
+         Solde: <span>{formatCurrency(bankAccount.balance, company?.currency)}</span>
         </p>
         <DetailTabsHeader tabs={tabs} />
       </div>

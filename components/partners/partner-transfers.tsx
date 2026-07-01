@@ -1,6 +1,6 @@
 'use client';
 
-import { Table, Button, Modal, Form, Input, InputNumber, Select, DatePicker, message } from "antd";
+import { Table, Button, Modal, Form, Input, InputNumber, Select, DatePicker, message, Typography } from "antd";
 import { PlusOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import dayjs from "dayjs";
@@ -218,8 +218,11 @@ export function PartnerTransfers({ partnerId }: PartnerTransfersProps) {
         dataIndex: "balanceAfter",
         key: "balanceAfter",
         align: "right",
-        render: (balanceAfter: number) =>
-          formatCurrency(balanceAfter, company?.currency),
+        render: (balanceAfter: number) => (
+          <Typography.Text type={balanceAfter >= 0 ? "success" : "danger"}>
+            {formatCurrency(balanceAfter, company?.currency)}
+          </Typography.Text>
+        ),
       },
       {
         title: "Note",
