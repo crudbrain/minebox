@@ -35,9 +35,9 @@ export function MobileSidebarDrawer({
       title={
         <div className="flex items-center gap-2">
           {company?.logo ? (
-            <Avatar src={company.logo} size="large" shape="square" />
+            <Avatar src={company.logo} shape="square" />
           ) : (
-            <Avatar size="large" shape="square">{company?.name?.[0]}</Avatar>
+            <Avatar shape="square">{company?.name?.[0]}</Avatar>
           )}
           <div className="font-semibold truncate">
             {company?.shortName || company?.name}

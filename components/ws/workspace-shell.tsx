@@ -19,15 +19,15 @@ export function WorkspaceShell({ children, company }: WorkspaceShellProps) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="h-screen overflow-hidden">
       <Sidebar
         company={company}
         mobileOpen={mobileDrawerOpen}
         onMobileClose={() => setMobileDrawerOpen(false)}
       />
-      <Layout>
+      <Layout className="flex flex-col h-full overflow-hidden">
         {isMobile && (
-          <div className="flex items-center justify-between px-4 py-3 bg-container border-b border-border-secondary">
+          <div className="flex items-center justify-between px-4 py-3 bg-container border-b border-border-secondary shrink-0">
             <Button
               type="text"
               icon={<MenuOutlined />}
@@ -39,7 +39,7 @@ export function WorkspaceShell({ children, company }: WorkspaceShellProps) {
             <UserDropdown collapsed />
           </div>
         )}
-        <Content className="p-3 md:p-6 bg-layout">
+        <Content className="p-3 md:p-6 bg-layout flex-1 min-h-0 overflow-y-auto">
           {children}
         </Content>
       </Layout>

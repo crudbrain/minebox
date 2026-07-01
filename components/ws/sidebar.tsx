@@ -104,7 +104,7 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
       collapsed={collapsed}
       collapsedWidth={80}
       trigger={null}
-      className="h-screen"
+      className="h-screen overflow-hidden"
       theme="light"
       style={{ display: "flex", flexDirection: "column" }}
     >
@@ -117,9 +117,9 @@ export function Sidebar({ company: companyProp, mobileOpen, onMobileClose }: Sid
               {!collapsed && (
                 <>
                   {company?.logo ? (
-                    <Avatar src={company.logo} size="large" shape="square" />
+                    <Avatar src={company.logo} shape="square" />
                   ) : (
-                    <Avatar size="large" shape="square">{company?.name?.[0]}</Avatar>
+                    <Avatar shape="square">{company?.name?.[0]}</Avatar>
                   )}
                   <div className="font-semibold truncate">
                     {company?.shortName || company?.name}
