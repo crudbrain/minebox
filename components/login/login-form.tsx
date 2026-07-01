@@ -51,7 +51,7 @@ export function LoginForm({ hasCompany }: LoginFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-layout">
+    <div className="min-h-screen flex items-center justify-center bg-layout px-4">
       <Card className="w-full max-w-sm">
         <Form layout="vertical" onFinish={onFinish} disabled={loading}>
           <Form.Item

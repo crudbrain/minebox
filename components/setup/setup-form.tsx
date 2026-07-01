@@ -122,7 +122,7 @@ export function SetupForm({ code }: { code: string }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-layout py-8">
+    <div className="min-h-screen flex items-center justify-center bg-layout px-4 py-8">
       <Card className="w-full max-w-lg">
         <Title level={3}>Configuration</Title>
         <Form
